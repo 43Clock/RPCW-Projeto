@@ -1,0 +1,58 @@
+SIMP
+    - ficheiro no formato ZIP  com ficheiros e pastas
+    - manifesto -> https://datatracker.ietf.org/doc/html/rfc8493
+        - descrever a estrutura e os restantes ficheiros e pastas
+        - XML ou JSON
+        - ficheiro de nome "RRD-SIP.(json|xml)"
+    - so ficheiros PDF e XML
+    - pipeline da implementação:
+        - inserir zip no formulário
+        - submeter fomulário
+        - verificar se RRD-SIP existe e se todos os ficheiros referenciados existem
+        - armazenar metadados na BD
+        - armazenar ficheiros numa pasta dentro do File System criada para o efeito
+        - converter num AIP
+
+AIP (armazenamento):
+
+    - solução híbrida - info no Mongo e no FileSystem
+    - metadados armazenados na BD:
+        - data de criação
+        - data de submissão
+        - identificação do produtor
+        - identificação de quem fez a submissão
+        - titulo do recurso
+        - Tipo de recurso -> taxonomia
+            - por exemplo, teste/exame, slides,
+                manual, relatório, tese de mestrado,...   
+    - armazenamento no FileSystem
+        - hashing do nome do ficheiro e dividir por pastas
+        - ou por utilizador
+    - guardar tudo o que acontece num ficheiro de log que pode ser visto pelo admin
+
+DIP dis nuts
+    - forma como serão disponibilizados os dados
+    - forma como é possivel explorar os recursos
+        - listar
+        - consultar
+        - descarregar
+    - fazer download de varios recursos, num formato parecido ao SIMP
+
+Admin
+    - Administração de utilizadores: registo, edição, remoção, listagem
+    - Administração de recursos (AIPs): inserção, edição, remoção, listagem, exportação;
+    - Administração de notícias, a ser exibidas na página de entrada: criação, alteração, tornar visível/invisível;
+    - Estatísticas de utilização: processamento dos logs que dará indicadores sobre a consulta online (visualização) e descarregamento (download) dos projetos.
+
+Arquitetura
+    - Base de dados em Mongo
+    - 1ª Camada aplicacional, API de dados
+        - aceder à base de dados, retornando JSONS
+        - modelo abstrato de acesso à BD, controlador e roteador
+    - 2ª Camada aplicacional, interface
+        - recebe dados da API de dados
+        - fluxo:
+            - router recebe pedido
+            - pede dados à api de dados
+            - recebe dados e envia resposta ao user
+    
