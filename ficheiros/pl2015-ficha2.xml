@@ -1,0 +1,393 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<AulaPrática xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aulaP.xsd" id="pl2015-f2">
+    <meta>
+        <disciplina>Processamento de Linguagens (LEI - 3ºano)</disciplina>
+        <datas>
+            <data tipo="criac.">2015-03-09</data>
+            <data tipo="rev.">2020-02-11</data>
+            <data tipo="rev.">2020-02-26</data>
+        </datas>
+        <objectivos>
+            <para>Este ficha prática contem exercícios para serem resolvidos nas aulas teórico-práticas com vista a sedimentar os conhecimentos
+                relativos a: <lista>
+                    <item>Motivação para o uso de Expresses Regulares (ERs) como forma de especificar padrões a pesquisar em textos - recurso a
+                        utilitários de <kw>Linux</kw> que seguem essa abordagem;</item>
+                    <item>Uso de Expressões Regulares para definir (gerar) Linguagens Regulares;</item>
+                    <item>Uso de Expressões Regulares para desenvolver programas eficientes, baseados em algoritmos standard guiados por Autómatos
+                        Finitos Deterministas, para reconhecer Linguagens Regulares;</item>
+                    <item>Uso de Autómatos Deterministas Reactivos, para processar Linguagens Regulares, isto é, para desencadear ações específicas ao
+                        reconhecer frases que derivam de padrões (definidos com base em ERs) - princípio da Programação baseada em regras
+                        <realce tipo="emph">Condição-Reação</realce>, <realce>Sistemas de Produção</realce>;</item>
+                    <item>Geração automática de programas a partir de especificações formais;</item>
+                    <item>Uso da ferramenta <kw>flex</kw>, disponível em ambiente <kw>Linux</kw>, para processamento de linguagens regulares,
+                        nomeadamente para criação de <realce>Filtros de Texto</realce> em geral.</item>
+                </lista>
+            </para>
+            <para>Para introduzir a ferramenta de geração de programas <realce tipo="emph">FLex</realce> baseada em especificações com Expressões
+                Regulares, e para ilustrar a importância do uso de autómatos deterministas reactivos como suporte à construção de programas
+                eficientes, propõem-se alguns exercícios, para resolver dentro ou fora da aula, que visam a criação de programas autónomos para
+                <realce tipo="emph">filtrar textos (FT)</realce>.</para>
+        </objectivos>
+        <changelog>
+            <update>
+                <date>2015-09-03</date>
+                <description>Foi criada a ficha a partir do ficheiro Tex do prh.</description>
+            </update>
+            <update>
+                <date>2020-02-11</date>
+                <description>Foram acrescentados mais exercícios adaptados por mim depois de algumas pesquisas em cursos similares.</description>
+            </update>
+        </changelog>
+    </meta>
+    <corpo>
+        <exercício>
+            <título>Processador de Questionários</título>
+            <enunciado>
+                <para>Suponha que ao fim de cada entrevista um Repórter produz um texto com as perguntas e respostas, distinguindo umas das outras
+                    porque as perguntas começam com 'EU:', no início da linha, e as respostas começam com 'ELE:', também no início da linha.</para>
+                <para>Nesse contexto, pretende-se desenvolver um <realce tipo="emph">FT</realce> para processar os questionários que:</para>
+                <alíneas>
+                    <alínea>simplesmente retire do texto original as tais marcas 'EU:' e 'ELE:', devolvendo todo o resto da entrevista sem qualquer
+                        alteração. Melhore o filtro, de modo a tratar as marcas, quer estejam escritas em maiúsculas, quer em minúsculas;</alínea>
+                    <alínea>substituia a marca 'EU' pela palavra 'Entrevistador' e a marca 'ELE' por 'Entrevistado';</alínea>
+                    <alínea>substituia a marca 'EU' pelo nome do entrevistador e a marca 'ELE' pelo nome do entrevistado, supondo que no início
+                        encontrará as respectivas definições (ordem irrelevante) na forma 'EU=nome.' ou 'ELE=nome.'</alínea>
+                </alíneas>
+            </enunciado>
+        </exercício>
+        <exercício>
+            <título>Expansor de Abreviaturas</título>
+            <enunciado>
+                <para>Quando se retiram apontamentos, ou de uma forma geral, se tem de escrever muito depressa, é hábito usar abreviaturas que
+                    correspondam a uma ou mais palavras vulgares e longas.</para>
+                <para>Suponha que criou esse costume e resolveu inserir nos seus textos as ditas abreviaturas (2 ou mais letras) precedidas pelo
+                    carácter '\'. Por exemplo: '\qq' (qualquer), ou '\mb' (muito bom), ou ainda '\sse' (se e só se).\</para>
+                <para>Desenvolva então as seguintes alíneas:</para>
+                <alíneas>
+                    <alínea>um <realce tipo="emph">FT</realce> que lhe devolva o texto original mas com todas as abreviaturas (que definiu à partida)
+                        devidamente expandidas;</alínea>
+                    <alínea>melhore o seu filtro de modo a contemplar ainda o tratamento do carácter '/' no fim de uma palavra, representando o sufixo
+                        'mente', e o carácter '~' no início de uma palavra, representando o prefixo 'in'. Uma palavra pode conter ambos os caracteres,
+                        um no início e outro no fim (pense na abreviatura da palavra 'infelizmente');</alínea>
+                    <alínea>outra melhoria que poderia introduzir no seu filtro era contemplar a possibilidade de definir abreviaturas dentro do
+                        próprio texto, na forma '\def:abrev=termo-expandido;'. Pense como o fazer e nas implicações que tal requisito teria no seu
+                        filtro original (alínea proposta para pensar fora da aula).</alínea>
+                </alíneas>
+            </enunciado>
+        </exercício>
+        <exercício>
+            <título>Somador de Números</título>
+            <enunciado>
+                <para>Construa um Filtro de Texto que adicione todos os números dum texto e que, no final, imprima a sua soma (no ficheiro de saída
+                    não deve aparecer nenhum caracter do texto de entrada).</para>
+                <para>Evolua o seu processador no sentido de:</para>
+                <alíneas>
+                    <alínea>Escrever a soma sempre que encontre o carácter '=';</alínea>
+                    <alínea>Só comece a somar quando detectar o carácter '+' e deixe de somar quando este carácter voltar a aparecer.</alínea>
+                </alíneas>
+            </enunciado>
+        </exercício>
+        <exercício>
+            <título>Documento anotado em XML</título>
+            <enunciado>
+                <para>Como sabe um Documento <realce tipo="emph">XML</realce> é um texto vulgar semeado de anotações, ou marcas, que são
+                    identificadores especiais (designados por <realce tipo="emph">elementos XML</realce>) intercalados entre os caracteres '&lt;' e
+                    '&gt;'. Num documento <realce tipo="emph">XML</realce> bem formado, a cada <realce tipo="emph">marca de abertura</realce>
+                    corresponderá uma <realce tipo="emph">marca de fecho</realce>, que tem o mesmo identificador, mas que começa por '&lt;/'
+                    terminando na mesma em '&gt;'.</para>
+                <para>Desenvolva um filtro de texto (FT) que receba um documento XML e:</para>
+                <alíneas>
+                    <alínea>devolva o texto original, após ter retirado todas as marcas;</alínea>
+                    <alínea>conte o número de <realce tipo="emph">marcas de abertura</realce> e o número de
+                        <realce tipo="emph">marcas de
+                            fecho</realce>, indicando <realce tipo="emph">erro</realce> sempre
+                        que se verifique um desequilíbrio entre ambas (aqui apenas se pede que detecte o erro por contagem e não atendendo ao
+                        <realce tipo="emph">identificador do elemento</realce> em causa em cada marca);</alínea>
+                    <alínea>verifique a concordância entre as <realce tipo="emph">marcas de abertura</realce> e as
+                        <realce tipo="emph">marcas de
+                            fecho</realce>}, isto é, garanta que as marcas se fecham por ordem
+                        inversa da que abrem, mas agora tomando em atenção o <realce tipo="emph">identificador do elemento</realce> em causa em cada
+                        marca. No fim produza uma listagem, ordenada alfabeticamente, de todos os elementos distintos encontrados.</alínea>
+                </alíneas>
+            </enunciado>
+        </exercício>
+        <exercício>
+            <título>Normalizador de Emails</título>
+            <enunciado>
+                <para>Os Emails escritos à moda <realce>PRH</realce> caracterizam-se por terem todas as palavras começadas por letras minúsculas, à
+                    exceção dos nomes próprios e siglas.</para>
+                <para>Desenvolva, então:</para>
+                <alíneas>
+                    <alínea>um FT que normalize o texto, <realce tipo="emph">capitalizando</realce> (escrevendo a letra inicial em maiúsculas) todas
+                        as palavras no início de cada frase. Além da primeira palavra do texto, uma frase começa depois de um '.', '?' ou '!', seguido
+                        de zero ou mais espaços, eventualmente um ou mais fim-de-linha;</alínea>
+                    <alínea>complete a especificação anterior de modo a que o seu <realce tipo="emph">normalizador de emails prh</realce> conte também
+                        todos os nomes próprios (palavras começadas por maiúsculas) e siglas (palavras formadas só por maiúsculas, uma ou mais)
+                        encontradas no texto original.</alínea>
+                </alíneas>
+            </enunciado>
+        </exercício>
+        <exercício>
+            <título>Palavras, números e número de linha</título>
+            <enunciado>
+                <para>Construa um programa em Lex que apresente todas as palavras e números do texto fonte, indicando o número da linha onde se
+                    encontram (numa segunda versão indique também em que coluna da linha é iniciada a palavra ou o número).</para>
+            </enunciado>
+        </exercício>
+        <exercício>
+            <título>Números mistos</título>
+            <enunciado>
+                <para>Um número misto é constituído por uma parte inteira e uma fração própria (numerador é inferior ao denominador). Exemplos: 5 3/4,
+                    1 2/3, 100 27/35.</para>
+                <para>Especifique um processador em lex que responda às seguintes alíneas:</para>
+                <alíneas>
+                    <alínea>Sempre que apanhar um número constituído por parte inteira e parte decimal converte-o num número misto. Exemplos dos
+                        números a converter: +356.32, -47.989, 3.731;</alínea>
+                    <alínea>Sempre que apanhar uma fração, verifica se esta é imprópria e, em caso afirmativo, converte-a para um número misto.
+                        Exemplos de frações impróprias: 10/3, -15/2, +35/25;</alínea>
+                    <alínea>Sempre que apanhar um número misto em que a fração é imprópria assinala o erro e apesenta a forma correta do número em
+                        causa;</alínea>
+                    <alínea>Em todas as situações a fração do número misto a ser apresentado deverá estar sempre na sua forma mais reduzida.</alínea>
+                </alíneas>
+            </enunciado>
+        </exercício>
+        <exercício>
+            <título>Tokenizer</título>
+            <enunciado>
+                <para>Normalmente, um programa/processador que converte uma sequência de carateres numa sequência de símbolos/tokens é designado por
+                    tokenizer.</para>
+                <para>Neste exercício deverás especificar um programa em C que usará um processador gerado pelo flex para reconhecer os vários
+                    símbolos da linguagem e indicar na saída a respetiva sequência de símbolos.</para>
+                <para>Os símbolos a reconhecer pertencem à linguagem duma calculadora aritmética simples e são:<listad>
+                        <item>
+                            <termo>Operadores</termo>
+                            <descricao>'+', '-', '/', '*';</descricao>
+                        </item>
+                        <item>
+                            <termo>Operandos</termo>
+                            <descricao>Números inteiros sem sinal;</descricao>
+                        </item>
+                        <item>
+                            <termo>Outros</termo>
+                            <descricao>Para agrupamento: '(', ')'.</descricao>
+                        </item>
+                    </listad></para>
+                <para>O teu programa deverá aceitar frases do tipo:</para>
+                <codigo>23+(4*76)</codigo>
+                <para>e gerar:</para>
+                <codigo>INT OP AP INT OP INT FP</codigo>
+                <para>O objetivo deste exercício é aprenderes a integrar o código gerado pelo flex numa aplicação em C.</para>
+            </enunciado>
+        </exercício>
+        <exercício>
+            <título>A Cabine Telefónica</título>
+            <enunciado>
+                <para>Pretende-se que utilize a ferramenta flex para implementar uma máquina de es- tados que modele a interacção dum utilizador com
+                    um telefone numa cabine pública.</para>
+                <para>O telefone reage aos seguintes comandos:<listad>
+                        <item>
+                            <termo>LEVANTAR</termo>
+                            <descricao>levantar o auscultador; marca o início duma interacção;</descricao>
+                        </item>
+                        <item>
+                            <termo>POUSAR</termo>
+                            <descricao>pousar o auscultador; fim da interacção; deverá ser indicado o montante a ser devolvido;</descricao>
+                        </item>
+                        <item>
+                            <termo>MOEDA &lt;lista de valores&gt;</termo>
+                            <descricao>inserção de moedas (só deverá aceitar moedas válidas, para valores inválidos deverá ser gerada uma mensagem de
+                                erro): lista de valores = num, num, ..., num;</descricao>
+                        </item>
+                        <item>
+                            <termo>T=numero</termo>
+                            <descricao>disca o número ( o número deve ter 9 dígitos excepto se for iniciado por "00"); as diferentes chamadas deverão
+                                ser tratadas da seguinte maneira:<lista>
+                                    <item>para números iniciados por "601" ou "641" a chamada é "barrada";</item>
+                                    <item>para chamadas internacionais (iniciadas por "00") o utilizador tem que ter um saldo igual ou superior a 1,5
+                                        euros, caso contrário deverá ser avisado que o saldo é insuficiente e a máquina volta ao estado anterior; a
+                                        chamada se for realizada tem um custo de 1,5 euros;</item>
+                                    <item>para chamadas nacionais (iniciadas por "2") o saldo mínimo e custo de chamada é de 25 cêntimos;</item>
+                                    <item>para chamadas verdes (iniciadas por "800") o custo é 0;</item>
+                                    <item>para chamadas azuis (iniciadas por "808") o custo é de 10 cêntimos.</item>
+                                </lista></descricao>
+                        </item>
+                        <item>
+                            <termo>ABORTAR</termo>
+                            <descricao>interromper a interacção; a máquina devolve as moedas.</descricao>
+                        </item>
+                    </listad></para>
+                <para>Como extra pode ainda detalhar como é que é devolvido o troco: quantas moedas e de que espécie compõem o troco.</para>
+                <para>A seguir apresenta-se uma possível interacção exemplo.</para>
+                <codigo><![CDATA[LEVANTAR
+maq: "Introduza moedas."
+MOEDA 10c, 30c, 50c, 2e.
+maq: "30c - moeda inválida; saldo = 2e60c"
+T=601181818
+maq: "Os números vermelhos estão proibidos!"
+T=253604470
+maq: "saldo = 2e35c"
+POUSAR
+maq: "troco=2e35c; Volte sempre!" ou maq: "troco= 1x2e, 1x20c, 1x10c, 1x5c; Volte sempre!"]]></codigo>
+            </enunciado>
+        </exercício>
+        <exercício>
+            <título>O programador da iluminação</título>
+            <enunciado>
+                <para>Um programador para controlo dum sistema de iluminação de jardim, depois de ligado à corrente, pode ser de novo desligado, ou
+                    então aceita dois comandos: <realce>manual</realce> ou <realce>automatico</realce>.</para>
+                <para>Em modo <realce>manual</realce> pode ser colocado em <realce>on</realce> (as luzes ficam a partir daí e até novo comando
+                    ligadas), ou em <realce>off</realce> (as luzes são desligadas e assim permanecem).</para>
+                <para>Em modo <realce>automático</realce> requer, ainda, mais duas indicações, a hora (0 a 24) a que deve ser ligado e o número de
+                    horas que deve permanecer ligado; fica, então, em <realce>stand-by</realce> até que receba um sinal para acender as luzes,
+                    mantendo as luzes acesas até ter recebido um número de impulsos de relógio igual ao número de horas para que foi
+                    programado.</para>
+                <para>Considerando que o sistema a modelar pode ser encarado como uma máquina de Transição de Estados, desenhe o
+                    <realce>autómato
+                        determinista reativo</realce> que modela o sistema e utilize a sua imaginação para o
+                    implementar em C com a ajuda do Lex.</para>
+            </enunciado>
+        </exercício>
+        <exercício>
+            <título>O Jogo dos Dardos</título>
+            <enunciado>
+                <para>Uma das variantes do conhecido jogo das setas (em que se lançam pequenas flechas contra um alvo circular dividido em sectores
+                    iguais marcados com pontos de 1 a 20) é designada por jogo dos 36: um jogador ganha quando, ao fim de lançar várias setas,
+                    conseguir acumular exactamente 36 pontos; perderá logo que a soma ultrapasse esse valor. Contudo só contam os pontos quando uma
+                    seta atingir um dos seguintes sectores: 19, 17, 20, 16, 10, 6, 12; cada vez que uma seta caia noutro sector, com pontos diferentes
+                    destes, a jogada não conta, é ignorada.</para>
+                <para>Pretende-se, então, desenvolver um programa eficiente que vá recebendo os pontos obtidos por um jogador e determine se este deve
+                    continuar a jogar, ou se deve parar por já ter ganho, ou por ter perdido. Considerando que o sistema a modelar pode ser encarado
+                    como uma Máquina de Transição de Estados, desenhe o autómato determinista reactivo que modela o sistema e implemente-o com a
+                    ferramenta flex do Unix.</para>
+            </enunciado>
+        </exercício>
+        <exercício>
+            <título>Username Alien</título>
+            <enunciado>
+                <para>Numa galáxia distante, num planeta muito diferente do nosso, cada utilizador dum computador tem um identificador que segue o
+                    seguinte formato:<lista>
+                        <item>Começa com um "underscore", ’_’, ou um ponto, ’.’;</item>
+                        <item>Após o primeiro caráter devem seguir-se um ou mais dígitos;</item>
+                        <item>Após um certo número de dígitos devem seguir-se três ou mais letras, maiúsculas e/ou minúsculas;</item>
+                        <item>O nome do utilizador pode ser, opcionalmente terminado por um "underscore", ’_’. Caso isso não aconteça, o último
+                            caráter deve ser uma letra.</item>
+                    </lista>
+                </para>
+                <para>Dada uma lista de nomes de utilizadores, um por linha, verifica quais são válidos.</para>
+                <para>Para esses, imprime "VALIDO" numa linha. Para os outros casos imprime "INVALIDO".</para>
+                <para>Exemplo de input:</para>
+                <codigo><![CDATA[_0898989811abced_ 
+_abce 
+_09090909abcD0]]></codigo>
+                <para>Exemplo de output:</para>
+                <codigo><![CDATA[VALIDO
+INVALIDO
+INVALIDO]]></codigo>
+            </enunciado>
+        </exercício>
+        <exercício>
+            <título>Endereços IP</título>
+            <enunciado>
+                <para>Dada uma lista de endereços IP, IPv4 ou IPv6, supostamente válidos, especifica um filtro que identifica o tipo de endereço IP ou
+                    acusa um erro.</para>
+                <para>Os endereços IPv4 foram os primeiros endereços a serem usados na Internet e eram constituídos por 4 bytes. O formato normal é
+                    "A.B.C.D" em que A, B, C e D são inteiros compreendidos entre 0 e 255 inclusive.</para>
+                <para>O IPv4 limitava o número de endereços a um número baixo para as necessidades de hoje em dia e assim surgiu o IPv6. Com 128 bits,
+                    veio permitir um maior espaço de endereçamento. Os 128 bits dum endereço IPv6 são representados em 8 grupos de 16 bits cada um.
+                    Cada grupo é representado por 4 dígitos hexadecimais e cada grupo é separado do seguinte por ':'. Por exemplo:
+                    "2001:0db8:0000:0000:0000:ff00:0042:8329". Os zeros à esquerda podem ser omitidos. Um endereço contendo "...:0:..." ou "...:5:..."
+                    é idêntico a "...:0000:..." ou "...:0005:....". </para>
+                <para>Exemplo de input:</para>
+                <codigo><![CDATA[Esta é uma linha de lixo.  
+121.18.19.20  
+2001:0db8:0000:0000:0000:ff00:0042:8329
+epl.di.uminho.pt 193.136.19.129]]></codigo>
+                <para>Exemplo de output:</para>
+                <codigo><![CDATA[Erro    
+IPv4  
+IPv6  
+Erro]]></codigo>
+            </enunciado>
+        </exercício>
+        <exercício>
+            <título>Latitude e Longitude</título>
+            <enunciado>
+                <para>Dada uma lista de pares de coordenadas, latitude e longitude, supostamente válidos, especifica um filtro que faz a sua
+                    verificação atendendo aos seguintes requisitos:<lista>
+                        <item>Cada par de coordenadas deverá seguir a forma: <kw>(X, Y)</kw> onde <kw>X</kw> e <kw>Y</kw> são números decimais (parte
+                            inteira e uma parte decimal opcional); </item>
+                        <item>O valor de <kw>X</kw> deverá estar entre -90 e +90;</item>
+                        <item>O valor de <kw>Y</kw> deverá estar entre -180 e +180;</item>
+                        <item>Quer <kw>X</kw> quer <kw>Y</kw> podem ser opcionalmente precedidos por um sinal + ou -;</item>
+                        <item>Tem de haver um espaço entre <kw>Y</kw> e a vírgula precedente;</item>
+                        <item>Não há espaço entre <kw>X</kw> e o parentesis precedente nem entre <kw>Y</kw> e o parentesis que se lhe segue;</item>
+                        <item>Não poderá haver zeros desnecessários à esquerda nas partes inteiras.</item>
+                    </lista></para>
+                <para>Exemplo de input:</para>
+                <codigo><![CDATA[(75, 180)
+(+90.0, -147.45)
+(77.11112223331, 149.99999999)
+(+90, +180)
+(90, 180)
+(-90.00000, -180.0000)
+(75, 280)
+(+190.0, -147.45)
+(77.11112223331, 249.99999999)
+(+90, +180.2)
+(90., 180.)
+(-090.00000, -180.0000)]]></codigo>
+                <para>Exemplo de output:</para>
+                <codigo><![CDATA[Válido
+Válido
+Válido
+Válido
+Válido
+Válido
+Inválido
+Inválido
+Inválido
+Inválido
+Inválido
+Inválido]]></codigo>
+            </enunciado>
+        </exercício>
+        <exercício>
+            <título>Matrículas de outro mundo</título>
+            <enunciado>
+                <para>Num país algures, as matrículas seguem os seguintes requisitos:<lista>
+                        <item>Uma matrícula tem 8 dígitos;</item>
+                        <item>Os 8 dígitos estão divididos em 4 partes iguais de 2 dígitos por um separador que pode ser '...', '-' ou ':';</item>
+                        <item>Cada matrícula só pode ter uma espécie de separador;</item>
+                        <item>Os separadores têm de ter dígitos antes e depois, não há espaços.</item>
+                    </lista></para>
+                <para>Especifique um programa em flex que apanhe e contabilize as matrículas num texto.</para>
+            </enunciado>
+        </exercício>
+        <exercício>
+            <título>Conversão de documentos XML</título>
+            <enunciado>
+                <para>Especifique em flex um filtro de texto que converte documentos XML numa sintaxe simplificada 
+                de acordo com o exemplo seguinte.</para>
+                <para>Exemplo de input:</para>
+                <codigo><![CDATA[<?xml version="1.0"?>
+ <compras tipo="lista">
+   <produto tipo="item">Batatas</produto>
+   <produto tipo="item">Cebolas</produto>
+ </compras>]]></codigo>
+                <para>Exemplo de output:</para>
+                <codigo><![CDATA[XML
+  (compras
+  A tipo lista
+  (produto
+  A tipo item
+  - Batatas
+  )produto
+  (produto
+  A tipo item
+  - Cebolas
+  )produto
+  )compras]]></codigo>
+            </enunciado>
+        </exercício>
+    </corpo>
+</AulaPrática>

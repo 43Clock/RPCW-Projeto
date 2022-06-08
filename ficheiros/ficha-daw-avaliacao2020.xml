@@ -1,0 +1,101 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<AulaPrática xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aulaP.xsd" id="daw2020-e1">
+  <meta>
+    <disciplina>Desenvolvimento de Aplicações Web (MIEI)</disciplina>
+    <datas>
+      <data tipo="criac.">2019-02-15</data>
+    </datas>
+    <objectivos>
+      <para>O objectivo principal desta ficha é testar os conhecimentos obtidos durante as aulas no desenvolvimento de aplicações Web e outras tarefas
+        afins.</para>
+      <para>Os resultados finais deverão ser enviados ao docente da seguinte forma:<lista>
+          <item>Enviar por email para: <kw>jcr@di.uminho.pt</kw></item>
+          <item>Colocar no subject/assunto: <kw>DWEB2019::Teste::Axxxxx</kw></item>
+          <item>Em que Axxxxx corresponde ao número do aluno;</item>
+          <item>Enviar um PR.xml onde descreve o que fez e inclui os 2 pontos seguintes;</item>
+          <item>Coloque todos os ficheiros das suas resoluções numa pasta com nome "TESTE" no GitHub que usou para os TPC;</item>
+          <item>Enviar link do GitHub onde guardou os ficheiros de resolução (não tente enviar ficheiros JS por email, mesmo dentro dum ZIP são detetados e barrados pelo servidor da UM);</item>
+          <item>Para os exercícios em que recorrer a mais do que um servidor, por exemplo, servidor node e servidor Mongo, explique como se pode
+            colocar a funcionar a sua App;</item>
+          <item>As aplicações desenvolvidas serão testadas recorrendo à sequência de comandos:<lista>
+            <item><kw>$ npm i</kw></item>
+            <item><kw>$ npm start</kw></item>
+          </lista></item>
+          <item>As respostas pedidas às queries podem ser colocadas num ficheiro de texto ou diretamente no texto do PR.xml.</item>
+        </lista></para>
+    </objectivos>
+    <recursos>
+      <documento url="http://www.di.uminho.pt/~jcr/Transfers/datasets/arquivo-musica-digital.xml">Arquivo de Música Digital.</documento>
+    </recursos>
+  </meta>
+  <corpo>
+    <exercício>
+      <título>Arquivo de Música Digital</título>
+      <enunciado>
+        <para>Considere o dataset contendo o arquivo de música digital disponibilizado em cima.</para>
+
+        <para>Neste exercício, terás de:</para>
+        <alíneas>
+          <alínea>Criar um servidor nodejs que dê suporte à seguinte API de dados (note que não é necessário qualquer interface web):<lista>
+              <item><kw>GET /api/obras</kw> - Devolve a lista de obras musicais apenas com os campos "id", "titulo", "tipo" e "compositor";</item>
+              <item><kw>GET /api/obras/:id</kw> - Devolve a informação completa de uma obra;</item>
+              <item><kw>GET /api/tipos</kw> - Devolve a lista de tipos, sem repetições;</item>
+              <item><kw>GET /api/obras?compositor=XXX</kw> - Devolve a lista de obras que tenham o campo "compositor" com o valor "XXX";</item>
+              <item><kw>GET /api/obras?instrumento=III</kw> - Devolve a lista de obras que tenham uma ou mais partituras para o instrumento III;</item>
+              <item><kw>GET /api/obrasQuant</kw> - Devolve uma lista de obras musicais com os seguintes campos: id, titulo, partituras (número de partituras disponíveis);</item>
+            </lista></alínea>
+        </alíneas>
+        <para>No PR, indique como fez a persistência dos dados e se optou pelo MongoDB, explique como importou o dataset e se o transformou como o fez.</para>
+      </enunciado>
+    </exercício>
+
+    <exercício>
+      <título>CLAV: Classificação e Avaliação da Informação Pública</título>
+      <enunciado>
+        <para>A CLAV é uma plataforma em desenvolvimento no DI/UM em parceria e sob encomenda da Direção Geral do Livro, Arquivos e Bibliotecas
+          (DGLAB) que visa a classificação e a avaliação de toda a documentação circulante na administração pública portuguesa.</para>
+        <para>Uma das faces visíveis do projeto é o catálogo dos processos da administração pública portuguesa, designado por Lista Consolidada.
+          Juntamente com este catálogo há outros: o catálogo de entidades, que contem as entidades da Administração Pública Portuguesa, o catálogo das
+          tipologias, que contem a lista de agrupamentos de entidades, e o catálogo legislativo, que contem a lista de diplomas legislativos que
+          regulam os processos.</para>
+        <para>Já se encontra disponível para consulta online: <xref url="http://clav.dglab.gov.pt">site oficial</xref> A respetiva API de dados e
+          respetiva documentação encontra-se acessível em: <xref url="http://clav-api.dglab.gov.pt/docs">API de dados</xref>.</para>
+        <para>Para user a API poderás usar a <xref url="http://www.di.uminho.pt/~jcr/Transfers/apikey.txt">APIKEY disponibilizada</xref>, exemplo:
+          <kw>http://clav-api.dglab.gov.pt/api/tipologias?apikey=...</kw></para>
+        <para>É sobre o catálogo de entidades que irás desenvolver este exercício.</para>
+        <para>A API de dados disponível contem entre outras as seguintes possibilidades:<lista>
+            <item><kw>GET http://clav-api.dglab.gov.pt/api/entidades</kw> - Devolve a lista de entidades com várias opções de configuração;</item>
+            <item><kw>GET http://clav-api.dglab.gov.pt/api/entidades/{id}</kw> - Devolve a informação de uma entidade com identificador igual a
+              id;</item>
+            <item><kw>GET http://clav-api.dglab.gov.pt/api/entidades/{id}/tipologias</kw> - Devolve a lista de tipologias a que a entidade 
+            <kw>id</kw> pertence;</item>
+          <item><kw>GET http://clav-api.dglab.gov.pt/api/entidades/{id}/intervencao/dono</kw> - Devolve a lista de processos de que a entidade é
+              dona;</item>
+          <item><kw>GET http://clav-api.dglab.gov.pt/api/entidades/{id}/intervencao/participante</kw> - Devolve a lista de processos de que a entidade é
+            participante;</item>
+          </lista></para>
+        <para>Desenvolve então as seguintes alíneas:</para>
+        <alíneas>
+          <alínea>Testa a API de dados com o Postman ou diretamente no link da API e dá resposta às seguintes questões:<lista>
+              <item>Quantas Entidades estão catalogadas?</item>
+              <item>A que  Tipologias pertence a Entidade "Autoridade para as Condições de Trabalho" (<kw>ent_ACT</kw>)?</item>
+              <item>Em que processos a entidade "Autoridade Nacional de Segurança Rodoviária" (<kw>ent_ANSR</kw>) participa como <kw>Iniciador</kw>?</item>
+              <item>De que processos é dona a entidade "Colégio Militar" (<kw>ent_CMil</kw>)?</item>
+            </lista></alínea>
+        </alíneas>
+        <para>Depois deste <realce>"aquecimento"</realce>, desenvolve uma aplicação em nodejs que permita navegar nesta estrutura de entiddes e
+          respetiva informação:</para>
+        <alíneas>
+          <alínea>Na página inicial, para além de um título e outra informação de contexto, deverá aparecer a lista de entidades (sigla e designação);</alínea>
+          <alínea>Todos os campos de informação com códigos de entidades, tipologias ou outros devem ser transformados em links com as chamadas à API
+            respetivas; Ao clicar numa linha desta tabela o utilizador deve ser dirigido para a página da Entidade;</alínea>
+          <alínea>Na página de cada entidade, deve ser mostrada a informação base da entidade, a lista de tipologias a que pertence, os processos
+            em que é dona e os processos em que é participante;</alínea>
+          <alínea>Em todas as páginas deverá haver um link para voltar à página inicial e outro para a página anterior (nos casos em que
+            justifique);</alínea>
+          <alínea>Usa a tua imaginação e criatividade...</alínea>
+        </alíneas>
+      </enunciado>
+    </exercício>
+  </corpo>
+</AulaPrática>

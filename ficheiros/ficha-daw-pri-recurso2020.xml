@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<AulaPrática xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aulaP.xsd" id="daw-pri-2020-recurso">
+  <meta>
+    <disciplina>Desenvolvimento de Aplicações Web (MIEI) e Processamento e Representação de Informação (MIEI)</disciplina>
+    <datas>
+      <data tipo="criac.">2019-02-25</data>
+    </datas>
+    <objectivos>
+      <para>O objectivo principal desta ficha é testar os conhecimentos obtidos durante as aulas no desenvolvimento de aplicações Web e outras tarefas
+        afins.</para>
+      <para>Os resultados finais deverão ser enviados ao docente da seguinte forma:<lista>
+          <item>Enviar por email para: <kw>jcr@di.uminho.pt</kw></item>
+        <item>Colocar no subject/assunto: <kw>DWEB2019::Exame::Axxxxx</kw> ou <kw>PRI2019::Exame::Axxxxx</kw></item>
+          <item>Em que Axxxxx corresponde ao número do aluno;</item>
+        <item>Enviar ao docente um link do github para um repositório novo criado especificamente para o exame com o seguinte conteúdo (<realce>esta preparação vale 1 valor do exame</realce>):<lista>
+          <item>O repositório no GitHub deverá chamar-se, consoante o caso, "DAW2019-Exame" ou "PRI2019-Exame";</item>
+          <item>Dentro do repositório deverá haver um ficheiro, "PR.xml", contendo uma descriçãode como fez a persistência de dados,  do setup de bases de dados, respostas textuais
+          pedidas, instruções de como executar as aplicações desenvolvidas, etc...</item>
+          <item>Dentro do repositório deverão existir duas pastas: "ex1", onde colocarão a aplicação desenvolvida para responder ao primeiro exercício e,
+          "ex2", onde colocarão a aplicação desenvolvida para responder ao segundo exercício.</item>
+        </lista></item>
+        </lista></para>
+      <para>Os exercícios que envolvam criação de rotas serão testados com as rotas no enunciado, qualquer rota que seja diferente da pedida será
+      avaliada com 0.</para>
+    </objectivos>
+    <recursos>
+      <documento url="http://www.di.uminho.pt/~jcr/Transfers/datasets/arquivo-musica-digital.xml">Arquivo de Música Digital.</documento>
+    </recursos>
+  </meta>
+  <corpo>
+    <exercício>
+      <título>Arquivo de Música Digital</título>
+      <enunciado>
+        <para>Considere o dataset contendo o arquivo de música digital disponibilizado em cima.</para>
+
+        <para>Neste exercício, terás de:</para>
+        <alíneas>
+          <alínea>Criar um servidor nodejs que dê suporte à seguinte API de dados (note que não é necessário qualquer interface web):<lista>
+              <item><kw>GET /api/obras</kw> - Devolve a lista de obras musicais apenas com os campos "id", "titulo", "tipo" e "compositor";</item>
+              <item><kw>GET /api/obras/:id</kw> - Devolve a informação completa de uma obra (considere para <kw>id</kw> o campo id que tem valores
+                "m1", "m2", ... "mn";</item>
+              <item><kw>GET /api/compositores</kw> - Devolve apenas uma lista com os nomes dos compositores, sem repetições e ordenada alfabeticamente;</item>
+              <item><kw>GET /api/obras?by=compositor</kw> - Devolve a lista de obras agrupadas por compositor, ou seja, devolve uma lista de compositores 
+                em que a cada compositor está associada uma lista de obras (coloque apenas o id e o título da obra);</item>
+            <item><kw>GET /api/obras?by=instrumento</kw> - Devolve a lista de obras agrupadas por instrumento, ou seja, devolve uma lista de instrumentos 
+              em que a cada instrumento está associada uma lista de obras (coloque apenas o id e o título da obra);</item>
+              <item><kw>GET /api/obrasQuant</kw> - Devolve uma lista de obras musicais com os seguintes campos: id, titulo, partituras (número de
+                partituras disponíveis);</item>
+            </lista></alínea>
+        </alíneas>
+      </enunciado>
+    </exercício>
+
+    <exercício>
+      <título>CLAV: Classificação e Avaliação da Informação Pública</título>
+      <enunciado>
+        <para>A CLAV é uma plataforma em desenvolvimento no DI/UM em parceria e sob encomenda da Direção Geral do Livro, Arquivos e Bibliotecas
+          (DGLAB) que visa a classificação e a avaliação de toda a documentação circulante na administração pública portuguesa.</para>
+        <para>Uma das faces visíveis do projeto é o catálogo dos processos da administração pública portuguesa, designado por Lista Consolidada.
+          Juntamente com este catálogo há outros: o catálogo de entidades, que contem as entidades da Administração Pública Portuguesa, o catálogo das
+          tipologias, que contem a lista de agrupamentos de entidades, e o catálogo legislativo, que contem a lista de diplomas legislativos que
+          regulam os processos.</para>
+        <para>Já se encontra disponível para consulta online: <xref url="http://clav.dglab.gov.pt">site oficial</xref> A respetiva API de dados e
+          respetiva documentação encontra-se acessível em: <xref url="http://clav-api.dglab.gov.pt/docs">API de dados</xref>.</para>
+        <para>Para user a API poderás usar a <xref url="http://www.di.uminho.pt/~jcr/Transfers/apikey.txt">APIKEY disponibilizada</xref>, exemplo:
+          <kw>http://clav-api.dglab.gov.pt/api/tipologias?apikey=...</kw></para>
+        <para>É sobre o catálogo legislativo que irás desenvolver este exercício.</para>
+        <para>A API de dados disponível contem entre outras as seguintes possibilidades:<lista>
+            <item><kw>GET http://clav-api.dglab.gov.pt/api/legislacao</kw> - Devolve a lista dos diplomas legislativos com várias opções de configuração, consulte
+              a interface swagger disponibilizada em cima para mais informações;</item>
+          <item><kw>GET http://clav-api.dglab.gov.pt/api/legislacao/{id}</kw> - Devolve a informação de um diploma com identificador igual a
+              id;</item>
+          <item><kw>GET http://clav-api.dglab.gov.pt/api/legislacao/{id}/processos</kw> - Devolve a lista dos processos regulados pelo diploma com identificador <kw>id</kw>.</item>
+          </lista></para>
+        <para>Desenvolve então as seguintes alíneas:</para>
+        <alíneas>
+          <alínea>Testa a API de dados com o Postman ou diretamente no link da API e dá resposta às seguintes questões:<lista>
+              <item>Quantos Diplomas Legislativos estão catalogados? (pista: na API há uma rota que dá este número diretamente)</item>
+              <item>Quantos diplomas do tipo "Portaria" estão catalogados?</item>
+              <item>Que processos são regulados pelo diploma "Lei 9/2009"?</item>
+              <item>Que diplomas legislativos estão associados ao processo "c300.10.005"?</item>
+            </lista></alínea>
+        </alíneas>
+        <para>Depois deste <realce>"aquecimento"</realce>, desenvolve uma aplicação em nodejs que permita navegar nesta estrutura de diplomas e
+          respetiva informação:</para>
+        <alíneas>
+          <alínea>Na página inicial, para além de um título e outra informação de contexto, deverá aparecer a lista de diplomas (data, tipo, número e sumário);</alínea>
+          <alínea>Ao clicar numa linha desta tabela o utilizador deve ser dirigido para a página do Diploma;</alínea>
+          <alínea>Na página de cada diploma, deve ser mostrada a informação base do diploma (data, sumário, link, estado, entidades responsáveis pela
+            sua publicação) e a lista de processos que regula;</alínea>
+          <alínea>As entidades deverã ser links para a página oficial da entidade: <kw>http://clav.dglab.gov.pt/...</kw>;</alínea>
+          <alínea>Os processos/classes deverão ser listados com os campos código e título e estes devem ser links para a página oficial do processo
+            correspondente: <kw>http://clav.dglab.gov.pt/...</kw></alínea>
+          <alínea>Usa a tua imaginação e criatividade...</alínea>
+        </alíneas>
+      </enunciado>
+    </exercício>
+  </corpo>
+</AulaPrática>

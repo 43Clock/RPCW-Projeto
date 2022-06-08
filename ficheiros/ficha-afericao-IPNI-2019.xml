@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<AulaPrática xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aulaP.xsd" id="ficha-aferição-IPNI2019">
+	<meta>
+		<disciplina>Introdução à Programação para Não Informáticos</disciplina>
+		<datas>
+			<data tipo="criac.">2019-04-29</data>
+		</datas>
+
+		<objectivos>
+			<para>O objectivo principal desta ficha é familiarizar o aluno com a programação de jogos e problemas simples. </para>
+			<para>Pretende-se aferir também os conhecimentos adquiridos até ao momento pelo que os alunos deverão resolvê-la individualmente na aula e
+				enviá-la ao docente até ao fim da mesma.</para>
+		</objectivos>
+	</meta>
+	<corpo>
+		<exercício>
+			<título>Triângulos</título>
+			<enunciado>
+				<para>À semelhança das últimas aulas, especifique um novo bloco cujo efeito é desenhar um triângulo equilátero.</para>
+				<para>Este bloco deverá ser parametrizado com a dimensão do lado e o ângulo (0-360) relativamente ao eixo do X em deverá ser
+				desenhado o primeiro segmento.</para>
+			</enunciado>
+		</exercício>
+		
+		<exercício>
+			<título>Mais triângulos...</título>
+			<enunciado>
+				<para>Baseando-se no que fez no exercício anterior, crie um novo bloco que desenha agora um triângulo cheio com uma 
+				determinada cor (passe esta também como parâmetro).</para>
+			</enunciado>
+		</exercício>
+		
+		
+		<exercício>
+			<título>Rectângulos</título>
+			<enunciado>
+				<para>Crie um bloco para desenhar um rectângulo em qualquer posição da tela.</para>
+			</enunciado>
+		</exercício>
+		
+		<exercício>
+			<título>Mais rectângulos...</título>
+			<enunciado>
+				<para>Repita o exercício anterior preenchendo o rectângulo com uma determinada cor.</para>
+			</enunciado>
+		</exercício>
+		
+		<exercício>
+			<título>Vamos desenhar</título>
+			<enunciado>
+				<para>Usando os blocos desenvolvidos nesta ficha e os das últimas aulas tente criar um desenho aproximado daqueles 
+				que se mostram a seguir:</para>
+				<imagem>
+					<legenda>Uma paisagem marítima</legenda>
+					<grafico path="../imagens/mar.png"/>
+				</imagem>
+				<imagem>
+					<legenda>Uma casa</legenda>
+					<grafico path="../imagens/house.png"/>
+				</imagem>
+			</enunciado>
+		</exercício>
+		
+		<exercício>
+			<título>"A la Picasso..."</título>
+			<enunciado>
+				<para>Crie um programa que aleatoriamente vai:<lista>
+					<item>desenhar uma forma: círculo, triângulo, quadrado ou rectângulo, de uma cor aleatória, numa posição
+						aleatória e de dimensão e orientação aleatórias;</item>
+					<item>repetir o processo indefinidamente.</item>
+				</lista></para>
+			</enunciado>
+		</exercício>
+		
+	</corpo>
+</AulaPrática>

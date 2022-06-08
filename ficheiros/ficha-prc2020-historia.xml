@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<AulaPrática xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="aulaP.xsd" id="prc-2020-historia">
+  <meta>
+    <disciplina>Processamento e Representação de Conhecimento (MIEI)</disciplina>
+    <datas>
+      <data tipo="criac.">2020-02-17</data>
+    </datas>
+    <objectivos>
+      <para>O objectivo principal desta ficha é testar os conhecimentos obtidos durante as aulas no desenvolvimento de ontologias OWL.</para>
+    </objectivos>
+  </meta>
+  <corpo>
+    <exercício>
+      <título>Escritório de advogacia</título>
+      <enunciado>
+        <para>Cinco advogados estão sentados lado a lado na sala de reuniões de um escritório.</para>
+        <para>Siga as pistas e use o raciocínio para descobrir o nome, a idade, o carro, a cor da gravata, a área de atuação e a bebida favorita de cada 
+          um deles.</para>
+        <para>Os nomes dos advogados são: Alberto, Carlos, Luís, Octávio e Ulisses.</para>
+        <para>As suas áreas de especialidade são: civil, comercial, consumidor, imobiliária e trabalho.</para>
+        <para>Possuem os seguintes carros: crossover, hyundai, pickup, subaru e suv.</para>
+        <para>As cores das respetivas gravatas são: amarela, azul, branca, verde e vermelha.</para>
+        <para>Cada um tem a sua bebiba favorita: caipirinha, cosmopolitan, margarita, martini e mojito.</para>
+        <para>São todos maiores de 30 anos: 30, 34, 37, 40 e 44.</para>
+        <para>Cria uma ontologia com a representação desta informação tentando atribuir as caraterísticas a cada um.</para>
+        <para>Pistas:</para>
+        <alíneas>
+          <alínea>O dono do SUV está num lugar entre o dono do Crossover e o dono do Subaru;</alínea>
+          <alínea>O Dr. Luís dirige um SUV.</alínea>
+          <alínea>O advogado de gravata Amarela está num lugar à esquerda do motorista do Hyundai.</alínea>
+          <alínea>Na primeira posição está o advogado que tem um Crossover.</alínea>
+          <alínea>O advogado de 37 anos está na quarta posição.</alínea>
+          <alínea>O advogado de 34 anos está num lugar entre o Dr. Otávio e o advogado da área Civil.</alínea>
+          <alínea>O advogado mais novo está na segunda posição.</alínea>
+          <alínea>Quem gosta de Mojito está exatamente à direita do advogado de 40 anos.</alínea>
+          <alínea>O advogado de 34 anos está exatamente à esquerda do que bebe Cosmopolitan.</alínea>
+          <alínea>Na quinta posição está o advogado que gosta de Caipirinha.</alínea>
+          <alínea>Quem gosta de Martini está na terceira posição.</alínea>
+          <alínea>O dono do SUV está na quarta posição.</alínea>
+          <alínea>O Dr. Carlos está numa das pontas.</alínea>
+          <alínea>O Dr. Ulisses está num lugar à direita de quem está com a gravata Amarela.</alínea>
+          <alínea>O advogado da gravata Amarela está num lugar entre o Dr. Otávio e o advogado de 34 anos.</alínea>
+          <alínea>O advogado da área Civil está na quarta posição.</alínea>
+          <alínea>Os advogados das áreas Trabalhista e Comercial estão lado a lado.</alínea>
+          <alínea>O advogado da área Trabalhista está em algum lugar entre o dono do Crossver e o advogado da área Comercial.</alínea>
+          <alínea>O advogado da área Imobiliária está exatamente à esquerda do advogado da área Trabalhista.</alínea>
+          <alínea>Quem está usando a gravata Branca está exatamente à direita do Dr. Luís.</alínea>
+          <alínea>Na quarta posição está o advogado da gravata Vermelha.</alínea>
+          <alínea>Na terceira posição está o advogado da gravata Azul.</alínea> 
+        </alíneas>
+      </enunciado>
+    </exercício>
+  </corpo>
+</AulaPrática>
