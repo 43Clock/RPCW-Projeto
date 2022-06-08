@@ -7,7 +7,7 @@ var indexRouter = require('./routes/index');
 
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://127.0.0.1:27017/Tarefas2021', 
+mongoose.connect('mongodb://127.0.0.1:27017/Projeto', 
       { useNewUrlParser: true,
         useUnifiedTopology: true,
         serverSelectionTimeoutMS: 5000});
@@ -25,23 +25,23 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Verifica se o pedido veio com o token de acesso
-app.use(function(req, res, next){
-  var myToken = req.query.token || req.body.token
-  if(myToken){
-    jwt.verify(myToken, "DAW2020", function(e, payload){
-      if(e){
-        res.status(401).jsonp({error: e})
-      }
-      else{
-        req.level = payload.level
-        next()
-      }
-    })
-  }
-  else{
-    res.status(401).jsonp({error: "Token inexistente!"})
-  }
-})
+// app.use(function(req, res, next){
+//   var myToken = req.query.token || req.body.token
+//   if(myToken){
+//     jwt.verify(myToken, "DAW2020", function(e, payload){
+//       if(e){
+//         res.status(401).jsonp({error: e})
+//       }
+//       else{
+//         req.level = payload.level
+//         next()
+//       }
+//     })
+//   }
+//   else{
+//     res.status(401).jsonp({error: "Token inexistente!"})
+//   }
+// })
 
 app.use('/', indexRouter);
 

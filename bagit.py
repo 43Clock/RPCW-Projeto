@@ -48,6 +48,8 @@ for dir, dirs,files in os.walk(path):
                 "path": relativePath+"/"+file
             })
 
+# data["data"] = data["data"][1:]
+
 with open(pathNew+"/RRD-SIP.json","w") as f:
     json.dump(data,f,indent=4)
 
