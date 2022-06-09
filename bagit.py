@@ -5,6 +5,7 @@ import hashlib
 import shutil
 import json
 import zipfile
+import time
 
 
 if sys.argv[1][::-1][0] == "/":
@@ -20,6 +21,7 @@ pathNew = input +"/temp"
 #     f.write("Tag-File-Character-Encoding: UTF-8")
 
 data = {
+    "date":int(str(time.time()).replace(".","")),
     "encoding": "UTF-8",
     "algorithm":"sha256",
     "data":[]

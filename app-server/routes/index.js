@@ -4,7 +4,8 @@ var axios = require('axios')
 const multer = require('multer');
 const decompress = require('decompress');
 var AdmZip = require('adm-zip');
-
+var CryptoJs = require('crypto-js')
+const fs = require('fs');
 
 var upload = multer({dest:'uploads/'})
 
@@ -20,21 +21,60 @@ router.post('/',upload.array('zip'), function(req,res){
     var zipEntries = zip.getEntries();
     //Pega no manifest se existir
     var manifest = zipEntries.filter(obj=>{return obj.entryName == "RRD-SIP.json"})
-    var files = zipEntries.filter(obj=>{return obj.entryName != "RRD-SIP.json"}).map(obj=>obj.entryName)
+    var files = zipEntries.filter(obj=>{return obj.entryName != "RRD-SIP.json"})
     var decoder = new TextDecoder()
     if(manifest.length == 1){
       manifest = manifest[0]
       var dados = JSON.parse(decoder.decode(manifest.getData()))
       var filesManifest = dados.data.map(obj=>obj.path)
+      var filesNames = files.map(obj=>obj.entryName)
       for(let file of filesManifest){
-          files = files.filter(item => item!=file)
+        filesNames = filesNames.filter(item => item!=file)
       }
-      var allIn = files.length == 0
-    }
+      var allIn = filesNames.length == 0
+      console.log(req.files[i].originalname.slice(0, -4))
+      //var ts = Math.round((new Date()).getTime() / 1000);
 
+      var hash = CryptoJs.MD5(req.files[i].originalname.slice(0, -4)+dados.date.toString()).toString()
+      var firstHalf = hash.slice(0,16)
+      var secondHalf = hash.slice(16,32)
+      if(!fs.existsSync(__dirname +"/../files")){
+        fs.mkdirSync(__dirname +"/../files")
+      }
+      if(!fs.existsSync(__dirname +"/../files/"+firstHalf)){
+        fs.mkdirSync(__dirname +"/../files/"+firstHalf)
+      }
+      if(!fs.existsSync(__dirname +"/../files/"+firstHalf+"/"+secondHalf)){
+        fs.mkdirSync(__dirname +"/../files/"+firstHalf+"/"+secondHalf)
+      }
+      console.log(files[0])
+      zipEntries.forEach(file =>{
+        var split = file.entryName.split("/")
+        var path = ""
+        //Cria paths
+        for(var i =  0;i<split.length-1;i++){
+          path+=split[i]+"/"
+          if(!fs.existsSync(__dirname +"/../files/"+firstHalf+"/"+secondHalf+"/"+path)){
+            fs.mkdirSync(__dirname +"/../files/"+firstHalf+"/"+secondHalf+"/"+path)
+          }
+        }
+        fs.writeFileSync(__dirname +"/../files/"+firstHalf+"/"+secondHalf+"/"+path+file.name,decoder.decode(file.getData()))
+      })
+    }
   }
-  res.render('index')
+  res.redirect("/")
 })
+
+/*
+//To replace
+var fs = require('fs');
+var dir = './tmp/but/then/nested';
+
+if (!fs.existsSync(dir)){
+    fs.mkdirSync(dir, { recursive: true });
+}*/
+
+
 
 // router.get('/login', function(req, res) {
 //   res.render('login-form');
