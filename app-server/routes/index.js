@@ -1,68 +1,137 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
-var axios = require('axios')
-const multer = require('multer');
-const decompress = require('decompress');
-var AdmZip = require('adm-zip');
-var CryptoJs = require('crypto-js')
-const fs = require('fs');
+var axios = require("axios");
+const multer = require("multer");
+const decompress = require("decompress");
+var AdmZip = require("adm-zip");
+var CryptoJs = require("crypto-js");
+const fs = require("fs");
+var axips = require("axios");
 
-var upload = multer({dest:'uploads/'})
+var upload = multer({ dest: "uploads/" });
 
-router.get('/', function(req, res) {
-  res.render('index');
+router.get("/", function (req, res) {
+  axios.get("http://localhost:8001/api/recursos")
+      .then(dados=>{
+        res.render("index",{ficheiros:dados.data});  
+      })
+      .catch(error=>{
+        res.render("error",{error:error})
+      })
+
 });
 
-router.post('/',upload.array('zip'), function(req,res){
-  for(let i = 0;i<req.files.length;i++){
-    let oldPath = __dirname + '/../' + req.files[i].path
-    let newPath = __dirname + '/../test/' + req.files[i].originalname
-    var zip = AdmZip(oldPath)
-    var zipEntries = zip.getEntries();
-    //Pega no manifest se existir
-    var manifest = zipEntries.filter(obj=>{return obj.entryName == "RRD-SIP.json"})
-    var files = zipEntries.filter(obj=>{return obj.entryName != "RRD-SIP.json"})
-    var decoder = new TextDecoder()
-    if(manifest.length == 1){
-      manifest = manifest[0]
-      var dados = JSON.parse(decoder.decode(manifest.getData()))
-      var filesManifest = dados.data.map(obj=>obj.path)
-      var filesNames = files.map(obj=>obj.entryName)
-      for(let file of filesManifest){
-        filesNames = filesNames.filter(item => item!=file)
-      }
-      var allIn = filesNames.length == 0
-      console.log(req.files[i].originalname.slice(0, -4))
-      //var ts = Math.round((new Date()).getTime() / 1000);
-
-      var hash = CryptoJs.MD5(req.files[i].originalname.slice(0, -4)+dados.date.toString()).toString()
-      var firstHalf = hash.slice(0,16)
-      var secondHalf = hash.slice(16,32)
-      if(!fs.existsSync(__dirname +"/../files")){
-        fs.mkdirSync(__dirname +"/../files")
-      }
-      if(!fs.existsSync(__dirname +"/../files/"+firstHalf)){
-        fs.mkdirSync(__dirname +"/../files/"+firstHalf)
-      }
-      if(!fs.existsSync(__dirname +"/../files/"+firstHalf+"/"+secondHalf)){
-        fs.mkdirSync(__dirname +"/../files/"+firstHalf+"/"+secondHalf)
-      }
-      console.log(files[0])
-      zipEntries.forEach(file =>{
-        var split = file.entryName.split("/")
-        var path = ""
-        //Cria paths
-        for(var i =  0;i<split.length-1;i++){
-          path+=split[i]+"/"
-          if(!fs.existsSync(__dirname +"/../files/"+firstHalf+"/"+secondHalf+"/"+path)){
-            fs.mkdirSync(__dirname +"/../files/"+firstHalf+"/"+secondHalf+"/"+path)
-          }
+router.post("/", upload.array("zip"), function (req, res) {
+  for (let i = 0; i < req.files.length; i++) {
+    let oldPath = __dirname + "/../" + req.files[i].path;
+    if (req.files[0].mimetype != "application/zip") {
+      //@TODO: Erro para caso não seja um zip
+    } 
+    else {
+      var zip = AdmZip(oldPath);
+      var zipEntries = zip.getEntries();
+      //Pega no manifest se existir
+      var manifest = zipEntries.filter((obj) => {
+        return obj.entryName == "RRD-SIP.json";
+      });
+      var files = zipEntries.filter((obj) => {
+        return obj.entryName != "RRD-SIP.json";
+      });
+      var decoder = new TextDecoder();
+      if (manifest.length == 1) {
+        manifest = manifest[0];
+        var dados = JSON.parse(decoder.decode(manifest.getData()));
+        var filesManifest = dados.data.map((obj) => obj.path);
+        var filesNames = files.map((obj) => obj.entryName);
+        for (let file of filesManifest) {
+          filesNames = filesNames.filter((item) => item != file);
         }
-        fs.writeFileSync(__dirname +"/../files/"+firstHalf+"/"+secondHalf+"/"+path+file.name,decoder.decode(file.getData()))
-      })
+        //TODO: fazer algo se n estiverem todos os ficheiros
+        var allIn = filesNames.length == 0;
+        if(allIn){
+            // console.log(req.files[i].originalname.slice(0, -4));
+            //var ts = Math.round((new Date()).getTime() / 1000);
+
+            //Cria Hash com nome do zip+data de criação
+            var zipName = req.files[i].originalname.slice(0, -4)
+            var hash = CryptoJs.MD5(
+               zipName + dados.date.toString()
+            ).toString();
+            var firstHalf = hash.slice(0, 16);
+            var secondHalf = hash.slice(16, 32);
+
+            //Cria pasta se não existe
+            if (!fs.existsSync( __dirname + "/../files/" + firstHalf + "/" + secondHalf)) {
+              fs.mkdirSync(__dirname + "/../files/" + firstHalf + "/" + secondHalf,{ recursive: true });
+            }
+            zipEntries.forEach((file) => {
+              if(file.name != "RRD-SIP.json"){
+                var split = file.entryName.split("/");
+                var path = "";
+                //Cria paths
+                for (var i = 0; i < split.length - 1; i++) {
+                  path += split[i] + "/";
+                  if (!fs.existsSync(__dirname + "/../files/" + firstHalf +"/" + secondHalf + "/" + path)) {
+                    fs.mkdirSync(__dirname + "/../files/" +firstHalf + "/" +secondHalf +"/" +path);
+                  }
+                }
+                fs.writeFileSync(__dirname + "/../files/" + firstHalf +"/" + secondHalf + "/" + path + file.name,
+                  decoder.decode(file.getData()));
+                //TODO: Mudar identificador do produtor e de submissao quando se fizer auth
+                const body = {
+                  data_criacao: dados.date,
+                  data_submissao: new Date().toISOString(),
+                  id_prod: "Someone",
+                  id_submissor: "Someone",
+                  zip_name: zipName,
+                  titulo_recurso: file.name,
+                  path_recurso: path,
+                  tipo_recurso: "Something"
+                }
+                axios.post("http://localhost:8001/api/recursos",body)
+                    .then(resposta=>{
+                      console.log(resposta.data)
+                    })
+                    .catch(error=>{
+                      res.render("erro")
+                    })
+              }
+            });
+          } 
+          //TODO: Caso de não ter todos os ficheiros
+        else {
+
+        }
+      }
+      //TODO: Caso de não ter manifest
+      else {
+
+      }
     }
   }
-  res.redirect("/")
+
+  res.redirect("/");
+});
+
+router.get("/download/:id", function(req,res){
+  var id = req.params.id
+  axios.get("http://localhost:8001/api/recursos/"+id)
+      .then(data=>{
+          var ficheiro = data.data
+          var zipName = ficheiro.zip_name;
+          var hash = CryptoJs.MD5(
+            zipName + ficheiro.data_criacao.toString())
+          .toString();
+          var firstHalf = hash.slice(0, 16);
+          var secondHalf = hash.slice(16, 32);
+          console.log(ficheiro)
+          console.log(__dirname+"/../files/"+firstHalf+"/"+secondHalf+"/"+ficheiro.path_recurso+ficheiro.titulo_recurso)
+          res.download(__dirname+"/../files/"+firstHalf+"/"+secondHalf+"/"+ficheiro.path_recurso+ficheiro.titulo_recurso)
+          res.status(200)
+      })
+      .catch(error=>{
+        res.render("error",{error:error})
+      })
 })
 
 /*
@@ -73,8 +142,6 @@ var dir = './tmp/but/then/nested';
 if (!fs.existsSync(dir)){
     fs.mkdirSync(dir, { recursive: true });
 }*/
-
-
 
 // router.get('/login', function(req, res) {
 //   res.render('login-form');

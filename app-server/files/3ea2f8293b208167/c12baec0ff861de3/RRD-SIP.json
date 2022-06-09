@@ -1,0 +1,59 @@
+{
+    "date": 16547695036433954,
+    "encoding": "UTF-8",
+    "algorithm": "sha256",
+    "data": [
+        {
+            "checksum": "aeac9260859fa835fedd9f09c169cf7a6221c93301be5ea333dfc49f006bc6b4",
+            "path": "data/ficha-daw-pri-recurso2020.xml"
+        },
+        {
+            "checksum": "7d2f26b92d2c1605619573df7151fd98604d47e669f9995df7e9a3b116ff6134",
+            "path": "data/ficha-daw-avaliacao2020.xml"
+        },
+        {
+            "checksum": "70a4a76a995d98126dc827032a0f3ba4aa3ef5b17e85a5a2f2978381538b9fb8",
+            "path": "data/ficha-afericao-IPNI-2019.xml"
+        },
+        {
+            "checksum": "4cf92f949a4092355bac2766dfbea9b5afc0cb7d1766ad8b04373149a22fee95",
+            "path": "data/ficha-prc2020-historia.xml"
+        },
+        {
+            "checksum": "a1e1a7ad6f662741403d661075537aaa2ab0adfc75cf96fa08136ade1db267a5",
+            "path": "data/ficha-pri-avaliacao2020.xml"
+        },
+        {
+            "checksum": "b498c4dbb4a44669c915d169dce82836500ad04b5248126d48079a9fab9bcd85",
+            "path": "data/prc2021-ficha-aferic\u0327a\u0303o.xml"
+        },
+        {
+            "checksum": "97902cd5d9c3ad54347fd565749ca01a72fdcef75d2cb9d068301feff9a027b1",
+            "path": "data/pl2015-ficha2.xml"
+        },
+        {
+            "checksum": "a1e1a7ad6f662741403d661075537aaa2ab0adfc75cf96fa08136ade1db267a5",
+            "path": "data/dados1/ficha-pri-avaliacao2020.xml"
+        },
+        {
+            "checksum": "b498c4dbb4a44669c915d169dce82836500ad04b5248126d48079a9fab9bcd85",
+            "path": "data/dados1/prc2021-ficha-aferic\u0327a\u0303o.xml"
+        },
+        {
+            "checksum": "97902cd5d9c3ad54347fd565749ca01a72fdcef75d2cb9d068301feff9a027b1",
+            "path": "data/dados1/pl2015-ficha2.xml"
+        },
+        {
+            "checksum": "a1e1a7ad6f662741403d661075537aaa2ab0adfc75cf96fa08136ade1db267a5",
+            "path": "data/dados2/ficha-pri-avaliacao2020.xml"
+        },
+        {
+            "checksum": "b498c4dbb4a44669c915d169dce82836500ad04b5248126d48079a9fab9bcd85",
+            "path": "data/dados2/prc2021-ficha-aferic\u0327a\u0303o.xml"
+        },
+        {
+            "checksum": "97902cd5d9c3ad54347fd565749ca01a72fdcef75d2cb9d068301feff9a027b1",
+            "path": "data/dados2/pl2015-ficha2.xml"
+        }
+    ]
+}
