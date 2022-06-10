@@ -10,10 +10,14 @@ var axips = require("axios");
 
 var upload = multer({ dest: "uploads/" });
 
-router.get("/", function (req, res) {
+router.get("/",function(req,res){
+  res.redirect("/login")
+})
+
+router.get("/recursos", function (req, res) {
   axios.get("http://localhost:8001/api/recursos")
       .then(dados=>{
-        res.render("index",{ficheiros:dados.data});  
+        res.render("recursos",{ficheiros:dados.data});  
       })
       .catch(error=>{
         res.render("error",{error:error})
@@ -21,7 +25,7 @@ router.get("/", function (req, res) {
 
 });
 
-router.post("/", upload.array("zip"), function (req, res) {
+router.post("/upload", upload.array("zip"), function (req, res) {
   for (let i = 0; i < req.files.length; i++) {
     let oldPath = __dirname + "/../" + req.files[i].path;
     if (req.files[0].mimetype != "application/zip") {
@@ -46,6 +50,7 @@ router.post("/", upload.array("zip"), function (req, res) {
         for (let file of filesManifest) {
           filesNames = filesNames.filter((item) => item != file);
         }
+        //TODO: verificar o mimetipe de todos os ficheiros e se o schema dos xmls esta bem
         //TODO: fazer algo se n estiverem todos os ficheiros
         var allIn = filesNames.length == 0;
         if(allIn){
@@ -64,6 +69,7 @@ router.post("/", upload.array("zip"), function (req, res) {
             if (!fs.existsSync( __dirname + "/../files/" + firstHalf + "/" + secondHalf)) {
               fs.mkdirSync(__dirname + "/../files/" + firstHalf + "/" + secondHalf,{ recursive: true });
             }
+            var data = new Date().toISOString().substring(0,16)
             zipEntries.forEach((file) => {
               if(file.name != "RRD-SIP.json"){
                 var split = file.entryName.split("/");
@@ -80,13 +86,13 @@ router.post("/", upload.array("zip"), function (req, res) {
                 //TODO: Mudar identificador do produtor e de submissao quando se fizer auth
                 const body = {
                   data_criacao: dados.date,
-                  data_submissao: new Date().toISOString(),
-                  id_prod: "Someone",
-                  id_submissor: "Someone",
+                  data_submissao: data,
+                  id_prod: "SomeoneElse",
+                  id_submissor: "SomeoneElse",
                   zip_name: zipName,
                   titulo_recurso: file.name,
                   path_recurso: path,
-                  tipo_recurso: "Something"
+                  tipo_recurso: req.body.tipo
                 }
                 axios.post("http://localhost:8001/api/recursos",body)
                     .then(resposta=>{
@@ -110,7 +116,7 @@ router.post("/", upload.array("zip"), function (req, res) {
     }
   }
 
-  res.redirect("/");
+  res.redirect("/upload");
 });
 
 router.get("/download/:id", function(req,res){
@@ -132,6 +138,18 @@ router.get("/download/:id", function(req,res){
       .catch(error=>{
         res.render("error",{error:error})
       })
+})
+
+router.get("/login",function(req,res){
+  res.render("login")
+})
+
+router.get("/registar",function(req,res){
+  res.render("registar")
+})
+
+router.get("/upload",function(req,res){
+  res.render("upload")
 })
 
 /*

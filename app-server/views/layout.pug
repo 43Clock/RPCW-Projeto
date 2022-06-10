@@ -1,7 +1,27 @@
 doctype html
 html
   head
-    title Gestão de Tarefas
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    title Repositório de Recursos Didáticos
+    link(rel='stylesheet', href='/stylesheets/w3.css')
+    link(href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" rel="stylesheet")
+    script(src="/javascripts/jquery-3.6.0.min.js")
+    script(src="/javascripts/jquery.modal.min.js")
+
   body
+    .w3-top
+      div(class="w3-bar w3-border w3-dark-grey")
+        a(href="/" class="w3-bar-item w3-button w3-green")
+          i(class="fa fa-home")
+        a(href="/upload" class="w3-bar-item w3-button w3-hover-black") Upload de Recursos 
+          i(class="fa fa-upload")
+        a(href="/recursos" class="w3-bar-item w3-button w3-hover-black") Listar Recursos 
+          i(class="fa fa-search")
+        a(href="/registar" class="w3-bar-item w3-button w3-hover-black w3-right") Registar   
+          i(class="fa fa-user-plus")
+        a(href="/login" class="w3-bar-item w3-button w3-hover-black w3-right") Login 
+          i(class="fa fa-user")
+        a(href="/logout" class="w3-bar-item w3-button w3-hover-black w3-right") Logout 
+          i(class="fa fa-user-minus")
+    br
+    br
     block content

@@ -1,0 +1,59 @@
+extends layout
+
+block content
+  .w3-card-4.w3-margin 
+    header.w3-container.w3-dark-grey
+      h2 Novo Ficheiro 
+
+    form.w3-container(action="/upload" method="POST" enctype="multipart/form-data")
+      .w3-container(id="lista")
+        .w3-container(id="f1")
+          //- .w3-cell-row
+          //-   label.w3-cell Descrição: 
+          //-   input.w3-input.w3-cell.w3-border(type="text" name="desc")
+          .w3-cell-row 
+            label.w3-cell Ficheiro:  
+            input.w3-input.w3-cell.w3-border.w3-margin-top(type="file" name="zip" required)
+          .w3-cell-row 
+            label.w3-cell Tipo:
+            select(class="w3-select w3-cell w3-margin-top" name="tipo" required)
+              option(value="" style="display:none" disable selected ) Escolher tipo de recurso 
+              option(value="Teste/Exame") Teste/Exame 
+              option(value="Slide") Slides
+              option(value="Manual") Manual 
+              option(value="Tese de Mestrado") Tese de Mestrado 
+              option(value="Outro") Outro
+      .w3-cell-row
+        button.w3-button.w3-round-large.w3-deep-purple.w3-margin(type="submit" value="Enviar") Enviar
+
+    //- .w3-card-4.modal(id="display")
+
+    //- .w3-card-4
+    //-   header.w3-container.w3-blue
+    //-     h1 Lista de ficheiros armazenados
+
+    //-   .w3-container
+    //-     if(ficheiros.length > 0)
+    //-       table.w3-table-all
+    //-         tr
+    //-           th Data
+    //-           th Produtor
+    //-           th Submissor
+    //-           th Ficheiro
+    //-           th Path
+    //-           th Zip
+    //-           th Tipo
+    //-           th Download 
+    //-         each f in ficheiros
+    //-           tr
+    //-             td=f.data_submissao
+    //-             td=f.id_prod
+    //-             td=f.id_submissor
+    //-             td=f.titulo_recurso
+    //-             td=f.path_recurso
+    //-             td=f.zip_name
+    //-             td=f.tipo_recurso
+    //-             td
+    //-               a(href="/download/"+f._id) Download
+    //-     else
+    //-       p Ainda não há ficheiros armazenados...
