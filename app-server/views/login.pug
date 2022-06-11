@@ -3,6 +3,8 @@ extends layout
 block content
     div(class="w3-container w3-border w3-round-large w3-light-grey" style="width:40%;margin:5em auto")
         h1.w3-center Login
+        if(erro)
+          p.w3-red.w3-center=erro
         form.w3-container(action='/login' method='POST')
             label Username
             input.w3-input.w3-border.w3-round(type="text" name="username" required)

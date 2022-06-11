@@ -1,6 +1,8 @@
 var createError = require('http-errors');
 var express = require('express');
 var logger = require('morgan');
+const bcrypt = require('bcrypt');
+
 
 var passport = require('passport')
 var LocalStrategy = require('passport-local').Strategy
@@ -27,7 +29,7 @@ passport.use(new LocalStrategy(
       .then(dados => {
         const user = dados
         if(!user) { return done(null, false, {message: 'Utilizador inexistente!\n'})}
-        if(password != user.password) { return done(null, false, {message: 'Credenciais inválidas!\n'})}
+        if(!bcrypt.compareSync(password,user.password)) { return done(null, false, {message: 'Credenciais inválidas!\n'})}
         return done(null, user)
       })
       .catch(e => done(e))

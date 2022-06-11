@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
-var jwt = require('jsonwebtoken')
+var jwt = require('jsonwebtoken');
+const { use } = require('passport');
 var passport = require('passport')
 
 var User = require('../controllers/user')
@@ -17,14 +18,23 @@ router.post('/', function(req, res){
     .catch(e => res.status(500).jsonp({error: e}))
 })
   
-router.post('/login', passport.authenticate('local'), function(req, res){
-  jwt.sign({ username: req.user.username, level: req.user.level}, 
-    "RPCWProjeto",
-    {expiresIn: "1h"},
-    function(e, token) {
-      if(e) res.status(501).jsonp({error: "Erro na geração do token: " + e}) 
-      else res.status(201).jsonp({token: token})
-});
+router.post('/login', function(req,res,next){
+    passport.authenticate('local',function(err,user,info){
+      if(err){
+        return next(err);
+      } 
+      if(!user){
+        return res.status(401).jsonp({erro:info.message})
+      }
+      jwt.sign({ username: user.username, level: user.level}, 
+        "RPCWProjeto",
+        {expiresIn: "1h"},
+        function(e, token) {
+          if(e) return res.status(501).jsonp({error: "Erro na geração do token: " + e}) 
+          else return res.status(201).jsonp({token: token})
+      });
+      
+    })(req,res,next)
 })
 
 router.post("/registar",function(req,res){

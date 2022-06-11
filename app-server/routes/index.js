@@ -5,6 +5,7 @@ const multer = require("multer");
 var AdmZip = require("adm-zip");
 var CryptoJs = require("crypto-js");
 const fs = require("fs");
+const bcrypt = require("bcrypt");
 
 var upload = multer({ dest: "uploads/" });
 
@@ -50,14 +51,14 @@ router.get("/recursos",verificaNivelConsumidor, function (req, res) {
 });
 
 router.get("/upload", verificaNivelProdutor,function(req,res){
-  res.render("upload",{token:req.cookies.token})
+  res.render("upload",{token:req.cookies.token,erro:req.query.erro})
 })
 
 router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req, res) {
   for (let i = 0; i < req.files.length; i++) {
     let oldPath = __dirname + "/../" + req.files[i].path;
     if (req.files[0].mimetype != "application/zip") {
-      //@TODO: Erro para caso não seja um zip
+      res.redirect("/upload?erro="+"Fichero tem de ser um zip")
     } 
     else {
       var zip = AdmZip(oldPath);
@@ -79,14 +80,10 @@ router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req,
           filesNames = filesNames.filter((item) => item != file);
         }
         //TODO: verificar o mimetipe de todos os ficheiros e se o schema dos xmls esta bem
-        //TODO: fazer algo se n estiverem todos os ficheiros
         var allIn = filesNames.length == 0;
         if(allIn){
-            // console.log(req.files[i].originalname.slice(0, -4));
-            //var ts = Math.round((new Date()).getTime() / 1000);
-
             //Cria Hash com nome do zip+data de criação
-            var zipName = req.files[i].originalname.slice(0, -4)
+            var zipName = req.files[i].originalname.split(".").slice(0,-1).join(".")
             var hash = CryptoJs.MD5(
                zipName + dados.date.toString()
             ).toString();
@@ -115,8 +112,8 @@ router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req,
                 const body = {
                   data_criacao: dados.date,
                   data_submissao: data,
-                  id_prod: "SomeoneElse",
-                  id_submissor: "SomeoneElse",
+                  id_prod: req.username,
+                  id_submissor: req.username,
                   zip_name: zipName,
                   titulo_recurso: file.name,
                   path_recurso: path,
@@ -131,20 +128,21 @@ router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req,
                     })
               }
             });
+            console.log(oldPath)
+            res.redirect("/upload")
           } 
           //TODO: Caso de não ter todos os ficheiros
         else {
-
+          res.redirect("/upload?erro="+"Manifest não representa ficheiros fornecidos")
         }
       }
       //TODO: Caso de não ter manifest
       else {
-
+        res.redirect("/upload?erro="+"Manifest não fornecido")
       }
     }
+    fs.unlinkSync(oldPath)
   }
-
-  res.redirect("/upload");
 });
 
 router.get("/download/:id", verificaNivelConsumidor, function(req,res){
@@ -169,11 +167,10 @@ router.get("/download/:id", verificaNivelConsumidor, function(req,res){
 })
 
 router.get("/login",function(req,res){
-    res.render("login",{token:req.cookies.token})
+    res.render("login",{token:req.cookies.token,erro:req.query.erro})
 })
 
 router.post("/login",function(req,res){
-  console.log("Login")
   axios.post('http://localhost:8002/users/login', req.body)
     .then(dados => {
       res.cookie('token', dados.data.token, {
@@ -183,7 +180,14 @@ router.post("/login",function(req,res){
       });
       res.redirect('/')
     })
-    .catch(e => res.redirect('/login', {error: e}))
+    .catch(error => {
+      console.log(error)
+      if(error.response.status == 409 || error.response.status == 401){
+        res.status(error.response.status).redirect("/login?erro="+error.response.data.erro)
+      }else{
+        res.render("error",{error:error})
+      }
+    })
 });
 
 
@@ -192,10 +196,13 @@ router.get("/registar",function(req,res){
 })
 
 router.post("/registar",function(req,res){
-  axios.post("http://localhost:8002/users/registar",req.body)
+  var form_data = req.body
+  const salt = bcrypt.genSaltSync(10)
+  form_data.password = bcrypt.hashSync(req.body.password,salt) 
+  axios.post("http://localhost:8002/users/registar",form_data)
       .then(data => {
         console.log(data)
-        res.redirect("/login")
+        res.redirect("/")
       })
       .catch(error=>{
         if(error.response.status == 409){
@@ -208,7 +215,8 @@ router.post("/registar",function(req,res){
 
 
 router.get("/logout",function(req,res){
-  
+  res.cookie("token",undefined)
+  res.clearCookie("token")
   res.redirect("/login")
 })
 

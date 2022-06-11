@@ -29,8 +29,8 @@ app.use(function(req,res,next){
         else
           next()
       }else{
-        //@TODO: verificar validade?
         req.level = payload.level
+        req.username = payload.username
         next()
       }
     })
