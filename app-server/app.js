@@ -2,6 +2,8 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var jwt = require('jsonwebtoken')
 
 var indexRouter = require('./routes/index');
 
@@ -14,7 +16,30 @@ app.set('view engine', 'pug');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(function(req,res,next){
+  var token = req.cookies.token
+  if(token!=undefined){
+    jwt.verify(token,"RPCWProjeto", (e,payload)=>{
+      if(e){
+        if(!(e instanceof jwt.TokenExpiredError))
+          res.status(403).render("error-level")
+        else
+          next()
+      }else{
+        //@TODO: verificar validade?
+        req.level = payload.level
+        next()
+      }
+    })
+  }
+  else{
+    next()
+  }
+})
+
 
 app.use('/', indexRouter);
 

@@ -2,22 +2,46 @@ var express = require("express");
 var router = express.Router();
 var axios = require("axios");
 const multer = require("multer");
-const decompress = require("decompress");
 var AdmZip = require("adm-zip");
 var CryptoJs = require("crypto-js");
 const fs = require("fs");
-var axips = require("axios");
 
 var upload = multer({ dest: "uploads/" });
+
+function verificaNivelConsumidor(req,res,next){
+  autorizados = ["Consumidor","Produtor","Administrador"]
+  if(autorizados.includes(req.level))
+    next()
+  else
+    res.status(403).render("error-level",{token:req.cookies.token})
+}
+
+function verificaNivelProdutor(req,res,next){
+  autorizados = ["Produtor","Administrador"]
+
+  if(autorizados.includes(req.level))
+    next()
+  else
+    res.status(403).render("error-level",{token:req.cookies.token})
+}
+
+function verificaNivelAdministrador(req,res,next){
+  autorizados = ["Administrador"]
+  if(autorizados.includes(req.level))
+    next()
+  else
+    res.status(403).render("error-level",{token:req.cookies.token})
+}
 
 router.get("/",function(req,res){
   res.redirect("/login")
 })
 
-router.get("/recursos", function (req, res) {
+
+router.get("/recursos",verificaNivelConsumidor, function (req, res) {
   axios.get("http://localhost:8001/api/recursos")
       .then(dados=>{
-        res.render("recursos",{ficheiros:dados.data});  
+        res.render("recursos",{ficheiros:dados.data,token:req.cookies.token});  
       })
       .catch(error=>{
         res.render("error",{error:error})
@@ -25,7 +49,11 @@ router.get("/recursos", function (req, res) {
 
 });
 
-router.post("/upload", upload.array("zip"), function (req, res) {
+router.get("/upload", verificaNivelProdutor,function(req,res){
+  res.render("upload",{token:req.cookies.token})
+})
+
+router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req, res) {
   for (let i = 0; i < req.files.length; i++) {
     let oldPath = __dirname + "/../" + req.files[i].path;
     if (req.files[0].mimetype != "application/zip") {
@@ -119,7 +147,7 @@ router.post("/upload", upload.array("zip"), function (req, res) {
   res.redirect("/upload");
 });
 
-router.get("/download/:id", function(req,res){
+router.get("/download/:id", verificaNivelConsumidor, function(req,res){
   var id = req.params.id
   axios.get("http://localhost:8001/api/recursos/"+id)
       .then(data=>{
@@ -141,15 +169,47 @@ router.get("/download/:id", function(req,res){
 })
 
 router.get("/login",function(req,res){
-  res.render("login")
+    res.render("login",{token:req.cookies.token})
 })
+
+router.post("/login",function(req,res){
+  console.log("Login")
+  axios.post('http://localhost:8002/users/login', req.body)
+    .then(dados => {
+      res.cookie('token', dados.data.token, {
+        expires: new Date(Date.now() + '1h'),
+        secure: false, // set to true if your using https
+        httpOnly: true
+      });
+      res.redirect('/')
+    })
+    .catch(e => res.redirect('/login', {error: e}))
+});
+
 
 router.get("/registar",function(req,res){
-  res.render("registar")
+  res.render("registar",{erro:req.query.erro,token:req.cookies.token})
 })
 
-router.get("/upload",function(req,res){
-  res.render("upload")
+router.post("/registar",function(req,res){
+  axios.post("http://localhost:8002/users/registar",req.body)
+      .then(data => {
+        console.log(data)
+        res.redirect("/login")
+      })
+      .catch(error=>{
+        if(error.response.status == 409){
+          res.status(409).redirect("/registar?erro="+error.response.data.erro)
+        }else{
+          res.render("error",{error:error})
+        }
+      })
+})
+
+
+router.get("/logout",function(req,res){
+  
+  res.redirect("/login")
 })
 
 /*

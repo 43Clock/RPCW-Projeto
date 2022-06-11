@@ -7,7 +7,7 @@ var LocalStrategy = require('passport-local').Strategy
 
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://127.0.0.1:27017/Tarefas2021', 
+mongoose.connect('mongodb://127.0.0.1:27017/Projeto', 
       { useNewUrlParser: true,
         useUnifiedTopology: true,
         serverSelectionTimeoutMS: 5000});

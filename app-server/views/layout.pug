@@ -16,12 +16,14 @@ html
           i(class="fa fa-upload")
         a(href="/recursos" class="w3-bar-item w3-button w3-hover-black") Listar Recursos 
           i(class="fa fa-search")
-        a(href="/registar" class="w3-bar-item w3-button w3-hover-black w3-right") Registar   
-          i(class="fa fa-user-plus")
-        a(href="/login" class="w3-bar-item w3-button w3-hover-black w3-right") Login 
-          i(class="fa fa-user")
-        a(href="/logout" class="w3-bar-item w3-button w3-hover-black w3-right") Logout 
-          i(class="fa fa-user-minus")
+        if(token)
+          a(href="/logout" class="w3-bar-item w3-button w3-hover-black w3-right") Logout 
+            i(class="fa fa-user-minus")
+        else   
+          a(href="/registar" class="w3-bar-item w3-button w3-hover-black w3-right") Registar   
+            i(class="fa fa-user-plus")
+          a(href="/login" class="w3-bar-item w3-button w3-hover-black w3-right") Login 
+            i(class="fa fa-user")
     br
     br
     block content
