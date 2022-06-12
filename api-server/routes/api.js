@@ -63,8 +63,15 @@ router.post("/recursos", function(req,res){
   Ficheiro.inserir(req.body)
         .then(data =>res.status(200).jsonp({ok:"ok"}))
         .catch(error=>res.status(501).jsonp({error:error}))
-  
 })
+
+router.get("/recursos/user/:id",function(req,res){
+  Ficheiro.consultarUser(req.params.id)
+        .then(data =>res.status(200).jsonp(data))
+        .catch(error=>res.status(502).jsonp({error:error}))
+
+})
+
 
 router.get("/recursos/:id",function(req,res){
   console.log(req.params.id)
@@ -72,8 +79,9 @@ router.get("/recursos/:id",function(req,res){
           .then(ficheiro=>{
             console.log(ficheiro)
             res.status(200).jsonp(ficheiro)})
-          .catch(error=>res.status(501).jsonp({error:error}))
+          .catch(error=>res.status(503).jsonp({error:error}))
 
 })
+
 
 module.exports = router;

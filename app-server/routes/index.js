@@ -108,7 +108,6 @@ router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req,
                 }
                 fs.writeFileSync(__dirname + "/../files/" + firstHalf +"/" + secondHalf + "/" + path + file.name,
                   decoder.decode(file.getData()));
-                //TODO: Mudar identificador do produtor e de submissao quando se fizer auth
                 const body = {
                   data_criacao: dados.date,
                   data_submissao: data,
@@ -131,12 +130,12 @@ router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req,
             console.log(oldPath)
             res.redirect("/upload")
           } 
-          //TODO: Caso de não ter todos os ficheiros
+          //Caso de não ter todos os ficheiros
         else {
           res.redirect("/upload?erro="+"Manifest não representa ficheiros fornecidos")
         }
       }
-      //TODO: Caso de não ter manifest
+      //Caso de não ter manifest
       else {
         res.redirect("/upload?erro="+"Manifest não fornecido")
       }
@@ -171,6 +170,7 @@ router.get("/login",function(req,res){
 })
 
 router.post("/login",function(req,res){
+  req.body.username = req.body.username.toLowerCase()
   axios.post('http://localhost:8002/users/login', req.body)
     .then(dados => {
       res.cookie('token', dados.data.token, {
@@ -196,9 +196,11 @@ router.get("/registar",function(req,res){
 })
 
 router.post("/registar",function(req,res){
+  if(req.body.password != req.body.password_confirm) res.redirect("/registar?erro=Passwords não são iguais")
   var form_data = req.body
   const salt = bcrypt.genSaltSync(10)
   form_data.password = bcrypt.hashSync(req.body.password,salt) 
+  form_data.username = req.body.username.toLowerCase()
   axios.post("http://localhost:8002/users/registar",form_data)
       .then(data => {
         console.log(data)
@@ -211,6 +213,14 @@ router.post("/registar",function(req,res){
           res.render("error",{error:error})
         }
       })
+})
+
+router.get("/editar",verificaNivelProdutor,function(req,res){
+  axios.get("http://localhost:8001/api/recursos/user/"+req.username)
+      .then(data=>{
+        res.render("editar",{ficheiros:data.data,token:req.cookies.token})
+      })
+      .catch(error=>res.render("error",{error:error}))
 })
 
 

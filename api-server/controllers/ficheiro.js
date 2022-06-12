@@ -15,6 +15,13 @@ module.exports.consultar = (id) => {
         .exec()
 }
 
+module.exports.consultarUser = (id) => {
+    return Ficheiro
+          .find({id_prod:id})
+          .sort([["data_submissao",1],["titulo_recurso","asc"]])
+          .exec()
+}
+
 module.exports.inserir = (t) => {
     var novo = new Ficheiro(t)
     return novo.save()
