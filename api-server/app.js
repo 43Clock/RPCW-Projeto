@@ -2,7 +2,10 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
-var jwt = require('jsonwebtoken')
+var jwt = require('jsonwebtoken');
+var cors = require("cors")
+var cors = require("cors")
+
 
 var apiRouter = require('./routes/api');
 var mongoose = require('mongoose');
@@ -22,6 +25,9 @@ var app = express();
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+
+var cors = require("cors")
+app.use(cors()) 
 
 app.use(logger('dev'));
 app.use(express.json());

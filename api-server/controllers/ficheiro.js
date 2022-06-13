@@ -3,7 +3,6 @@ var mongoose = require("mongoose");
 
 // Devolve a lista de Tarefas
 module.exports.listar = () => {
-    console.log("Cena")
     return Ficheiro
         .find()
         .exec()
@@ -28,9 +27,8 @@ module.exports.inserir = (t) => {
 }
 
 module.exports.remover = function(id){
-    return Ficheiro.deleteOne({_id: id})
+    return Ficheiro.deleteOne({_id: mongoose.Types.ObjectId(id)})
 }
-
-module.exports.alterar = function(t){
-    return Ficheiro.findByIdAndUpdate({_id: t._id}, t, {new: true})
+module.exports.alterar = function(id,tipo){
+    return Ficheiro.findOneAndUpdate({_id: mongoose.Types.ObjectId(id)}, {tipo_recurso:tipo},{new:true})
 }

@@ -22,6 +22,8 @@ block content
                 td
                     button(id="edit-"+f._id class="w3-button w3-round-large w3-tiny w3-blue")
                         i(class="fa fa-pen")
+                td
+                    button(id="remove-"+f._id class="w3-button w3-round-large w3-tiny w3-red") Remover
                   
         else
           p Ainda não há ficheiros armazenados...
@@ -89,9 +91,11 @@ block content
             $("#row-"+lastId).children("td:eq(4)").remove()
             $("#row-"+lastId).children("td:eq(4)").remove()
             $("#row-"+lastId).append('<td><button id="edit-'+lastId +'" class="w3-button w3-round-large w3-tiny w3-blue"><i class="fa fa-pen"></i></button></td>')
+            $("#row-"+lastId).append('<td><button id="remove-'+lastId+'" class="w3-button w3-round-large w3-tiny w3-red">Remover</button></td>')
             $("#tipo-"+lastId).html(lastText)
         }
-        $("#row-"+id).children("td:eq(4)").remove()
+        $("#row-"+id).children("td:eq(-1)").remove()
+        $("#row-"+id).children("td:eq(-1)").remove()
         $("#row-"+id).append('<td><button id="accept-'+id+'" class="w3-button w3-round-large w3-tiny w3-green"><i class="fa fa-check"></i></button></td>')
         $("#row-"+id).append('<td><button id="cancel-'+id+'" class="w3-button w3-round-large w3-tiny w3-red"><i class="fa fa-times"></i></button></td>')
         var text = $("#tipo-"+id).text()
@@ -106,6 +110,7 @@ block content
         $("#row-"+id).children("td:eq(4)").remove()
         $("#row-"+id).children("td:eq(4)").remove()
         $("#row-"+id).append('<td><button id="edit-'+id+'" class="w3-button w3-round-large w3-tiny w3-blue"><i class="fa fa-pen"></i></button></td>')
+        $("#row-"+id).append('<td><button id="remove-'+id+'" class="w3-button w3-round-large w3-tiny w3-red">Remover</button></td>')
         $("#tipo-"+id).html(lastText)
         lastId = undefined
     })
@@ -118,5 +123,64 @@ block content
         var valor = $("#select-"+id+" option:selected").val()
         $("#tipo-"+id).text(valor)
         lastId = undefined
-        //@TODO: enviar pedido para api para mudar
+        if(valor != lastText){
+            var data = {}
+            data["tipo_recurso"] = valor
+            $.ajax({
+                url:"http://localhost:8001/api/recursos/"+id,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(){
+                    location.reload()
+                },
+                error: function(){
+                    location.reload()
+                }
+            })
+        }
     })
+    $(document).on('click','button[id^=accept]',function(){
+        var id = $(this).attr("id").split("-")[1]
+        $("#row-"+id).children("td:eq(4)").remove()
+        $("#row-"+id).children("td:eq(4)").remove()
+        $("#row-"+id).append('<td><button id="edit-'+id+'" class="w3-button w3-round-large w3-tiny w3-blue"><i class="fa fa-pen"></i></button></td>')
+        var valor = $("#select-"+id+" option:selected").val()
+        $("#tipo-"+id).text(valor)
+        lastId = undefined
+        if(valor != lastText){
+            var data = {}
+            data["tipo_recurso"] = valor
+            $.ajax({
+                url:"http://localhost:8001/api/recursos/"+id,
+                type: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(){
+                    location.reload()
+                },
+                error: function(){
+                    location.reload()
+                }
+            })
+        }
+    })
+
+    $(document).on('click','button[id^=remove]',function(){
+        var id = $(this).attr("id").split("-")[1]
+        lastId = undefined
+        var data = {}
+        $.ajax({
+            url:"http://localhost:8003/delete/"+id,
+            type: 'DELETE',
+            success: function(){
+                location.reload()
+            },
+            error: function(){
+                location.reload()
+            }
+        })
+        
+    })
+
+    

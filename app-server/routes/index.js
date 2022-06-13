@@ -223,6 +223,31 @@ router.get("/editar",verificaNivelProdutor,function(req,res){
       .catch(error=>res.render("error",{error:error}))
 })
 
+router.delete("/delete/:id",verificaNivelProdutor,function(req,res){
+  axios.get("http://localhost:8001/api/recursos/user/"+req.username)
+      .then(data=>{
+        var ids = data.data.map(ele=>ele._id)
+        if(!(req.level == "Administrador" || ids.includes(req.params.id))){          
+          res.redirect("/")
+        } 
+        else{
+          axios.delete("http://localhost:8001/api/recursos/"+req.params.id)
+              .then(complete=>{
+                var ficheiro = data.data.filter(ele=>ele._id == req.params.id)[0]
+                var zipName = ficheiro.zip_name;
+                var hash = CryptoJs.MD5(
+                  zipName + ficheiro.data_criacao.toString())
+                .toString();
+                var firstHalf = hash.slice(0, 16);
+                var secondHalf = hash.slice(16, 32);
+                fs.unlinkSync(__dirname+"/../files/"+firstHalf+"/"+secondHalf+"/"+ficheiro.path_recurso+ficheiro.titulo_recurso)
+                res.redirect("/editar")
+              })
+              .catch(error=>res.render("error",{error:error}))
+        }
+      })
+      .catch(error=>res.render("error",{error:error}))
+})
 
 router.get("/logout",function(req,res){
   res.cookie("token",undefined)
