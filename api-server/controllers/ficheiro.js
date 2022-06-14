@@ -16,7 +16,7 @@ module.exports.consultar = (id) => {
 
 module.exports.consultarUser = (id) => {
     return Ficheiro
-          .find({id_prod:id})
+          .find({id_submissor:id})
           .sort([["data_submissao",1],["titulo_recurso","asc"]])
           .exec()
 }

@@ -6,7 +6,6 @@ var User = require('../models/user')
 module.exports.listar = () => {
     return User
         .find()
-        .sort('username')
         .exec()
 }
 

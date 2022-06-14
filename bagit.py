@@ -20,11 +20,17 @@ pathNew = input +"/temp"
 #     f.write("BagIt-Version: M.N")
 #     f.write("Tag-File-Character-Encoding: UTF-8")
 
-data = {
-    "date":int(str(time.time()).replace(".","")),
+dataManifest = {
     "encoding": "UTF-8",
     "algorithm":"sha256",
     "data":[]
+}
+
+dataMetadados = {
+    "date":int(str(time.time()).replace(".","")),
+    "producer": sys.argv[3],
+    "titulo": sys.argv[4],
+    "tipo": sys.argv[5]
 }
 
 try:
@@ -45,7 +51,7 @@ for dir, dirs,files in os.walk(path):
             with open(dir+"/"+file,"rb") as f:
                 bytes  = f.read()
                 hash = str(hashlib.sha256(bytes).hexdigest())
-            data["data"].append({
+            dataManifest["data"].append({
                 "checksum":hash,
                 "path": relativePath+"/"+file
             })
@@ -53,9 +59,12 @@ for dir, dirs,files in os.walk(path):
 # data["data"] = data["data"][1:]
 
 with open(pathNew+"/RRD-SIP.json","w") as f:
-    json.dump(data,f,indent=4)
+    json.dump(dataManifest,f,indent=4)
 
-with zipfile.ZipFile(path+"/"+sys.argv[2]+".zip",mode='w') as zipf:
+with open(pathNew+"/metadados.json","w") as f:
+    json.dump(dataMetadados,f,indent=4)
+
+with zipfile.ZipFile("./"+sys.argv[2]+".zip",mode='w') as zipf:
     folder_path = pathNew
     print(pathNew)
     len_dir_path = len(folder_path)
@@ -63,3 +72,6 @@ with zipfile.ZipFile(path+"/"+sys.argv[2]+".zip",mode='w') as zipf:
         for file in files:
             file_path = os.path.join(root, file)
             zipf.write(file_path, file_path[len_dir_path:])
+
+
+shutil.rmtree(pathNew)

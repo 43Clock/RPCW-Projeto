@@ -52,4 +52,9 @@ router.post("/registar",function(req,res){
       .catch(error=>res.status(502).jsonp({error:error}))
 })
 
+router.get("users",function(req,res){
+  User.listar()
+      .then(data=>res.status(200).jsonp(data))
+      .catch(error=>res.status(504).jsonp({error:error}))
+})
 module.exports = router;

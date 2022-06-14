@@ -18,6 +18,7 @@ router.get("/recursos",function(req,res){
 })
 
 router.post("/recursos", function(req,res){
+  console.log(req.body)
   Ficheiro.inserir(req.body)
         .then(data =>res.status(200).jsonp({ok:"ok"}))
         .catch(error=>res.status(501).jsonp({error:error}))

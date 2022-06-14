@@ -10,6 +10,7 @@ var ficheiroSchema = new mongoose.Schema({
     id_prod: String,
     id_submissor: String,
     zip_name: String,
+    nome_ficheiro: String,
     titulo_recurso: String,
     path_recurso: String,
     tipo_recurso: String

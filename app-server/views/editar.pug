@@ -11,13 +11,13 @@ block content
             tr
               th(id="0" onclick="sortTable(0)") Data
               th(id="1" onclick="sortTable(1)") Ficheiro
-              th(id="2" onclick="sortTable(2)") Projeto
+              th(id="2" onclick="sortTable(2)") Titulo Recurso
               th(id="3" onclick="sortTable(3)") Tipo
             each f in ficheiros
               tr(id="row-"+f._id)
                 td=f.data_submissao
+                td=f.nome_ficheiro
                 td=f.titulo_recurso
-                td=f.zip_name
                 td(id="tipo-"+f._id)=f.tipo_recurso
                 td
                     button(id="edit-"+f._id class="w3-button w3-round-large w3-tiny w3-blue")
@@ -100,7 +100,7 @@ block content
         $("#row-"+id).append('<td><button id="cancel-'+id+'" class="w3-button w3-round-large w3-tiny w3-red"><i class="fa fa-times"></i></button></td>')
         var text = $("#tipo-"+id).text()
         lastText = text
-        $("#tipo-"+id).html('<select id="select-'+id+'" class="w3-select" name="tipo"><option value="Teste/Exame">Teste/Exame</option><option value="Slide">Slides</option><option value="Manual">Manual</option><option value="Tese de Mestrado">Tese de Mestrado</option><option value="Outro">Outro</option></select>')
+        $("#tipo-"+id).html('<select id="select-'+id+'" class="w3-select" name="tipo"><option value="Teste/Exame">Teste/Exame</option><option value="Slides">Slides</option><option value="Manual">Manual</option><option value="Tese de Mestrado">Tese de Mestrado</option><option value="Outro">Outro</option></select>')
         lastId = id
     })
 
@@ -115,31 +115,6 @@ block content
         lastId = undefined
     })
 
-    $(document).on('click','button[id^=accept]',function(){
-        var id = $(this).attr("id").split("-")[1]
-        $("#row-"+id).children("td:eq(4)").remove()
-        $("#row-"+id).children("td:eq(4)").remove()
-        $("#row-"+id).append('<td><button id="edit-'+id+'" class="w3-button w3-round-large w3-tiny w3-blue"><i class="fa fa-pen"></i></button></td>')
-        var valor = $("#select-"+id+" option:selected").val()
-        $("#tipo-"+id).text(valor)
-        lastId = undefined
-        if(valor != lastText){
-            var data = {}
-            data["tipo_recurso"] = valor
-            $.ajax({
-                url:"http://localhost:8001/api/recursos/"+id,
-                type: 'PUT',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function(){
-                    location.reload()
-                },
-                error: function(){
-                    location.reload()
-                }
-            })
-        }
-    })
     $(document).on('click','button[id^=accept]',function(){
         var id = $(this).attr("id").split("-")[1]
         $("#row-"+id).children("td:eq(4)").remove()

@@ -2,6 +2,7 @@ var createError = require('http-errors');
 var express = require('express');
 var logger = require('morgan');
 const bcrypt = require('bcrypt');
+const cors = require('cors');
 
 
 var passport = require('passport')
@@ -54,6 +55,7 @@ var usersRouter = require('./routes/user');
 
 var app = express();
 
+app.use(cors())
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
