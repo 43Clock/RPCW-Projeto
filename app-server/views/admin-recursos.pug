@@ -25,24 +25,25 @@ block content
                         th(id="1" onclick="sortTable(1)") Ficheiro
                         th(id="2" onclick="sortTable(2)") Titulo Recurso
                         th(id="3" onclick="sortTable(3)") Tipo
-                    each f in recursos
-                        tr(id="row-"+f._id)
-                            td=f.data_submissao
-                            td=f.nome_ficheiro
-                            td=f.titulo_recurso
-                            td(id="tipo-"+f._id)=f.tipo_recurso
-                            td
-                                button(id="edit-"+f._id class="w3-button w3-round-large w3-tiny w3-blue")
-                                    i(class="fa fa-pen")
-                            td
-                                button(id="remove-"+f._id class="w3-button w3-round-large w3-tiny w3-red") Remover
+                    tbody(id="myTable")
+                        each f in recursos
+                            tr(id="row-"+f._id)
+                                td=f.data_submissao
+                                td=f.nome_ficheiro
+                                td=f.titulo_recurso
+                                td(id="tipo-"+f._id)=f.tipo_recurso
+                                td
+                                    button(id="edit-"+f._id class="w3-button w3-round-large w3-tiny w3-blue")
+                                        i(class="fa fa-pen")
+                                td
+                                    button(id="remove-"+f._id class="w3-button w3-round-large w3-tiny w3-red") Remover
             else
                 p Ainda não há ficheiros armazenados...
 
     script.
         $("#searchbar").on("keyup", function() {
             var value = $(this).val().toLowerCase();
-            $("#tabela tr").filter(function() {
+            $("#myTable tr").filter(function() {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
             });
         });

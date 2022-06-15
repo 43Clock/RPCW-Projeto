@@ -19,11 +19,13 @@ block content
         div(id="display" class="w3-col m9")
             input(type="text" id="searchbar")
             table.w3-table-all(id="tabela")
-                tr
-                    th(id="0" onclick="sortTable(0)") Username
-                    th(id="1" onclick="sortTable(1)") Level
-                    th Editar
-                    th Remover
+                thead
+                    tr
+                        th(id="0" onclick="sortTable(0)") Username
+                        th(id="1" onclick="sortTable(1)") Level
+                        th Editar
+                        th Remover
+                <tbody id="myTable">
                 each user in utilizadores
                     tr(id="row-"+user._id)
                         td(id="username-"+user._id)=user.username
@@ -37,7 +39,7 @@ block content
         
         $("#searchbar").on("keyup", function() {
             var value = $(this).val().toLowerCase();
-            $("#tabela tr").filter(function() {
+            $("#myTable tr").filter(function() {
             $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
             });
         });
