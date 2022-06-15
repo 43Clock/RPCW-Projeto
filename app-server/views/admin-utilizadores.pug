@@ -34,6 +34,14 @@ block content
                         td
                             button(id="remove-"+user._id class="w3-button w3-round-large w3-tiny w3-red") Remover
     script.
+        
+        $("#searchbar").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#tabela tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
         var lastColumn = undefined
         var lastLevel = undefined
         var lastUsername = undefined
@@ -90,13 +98,6 @@ block content
             lastColumn = n;
         }
 
-        /*
-        $("#searchbar").on("keyup", function() {
-            var value = $(this).val().toLowerCase();
-            $("#tabela tr").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-            });
-        });*/
         
         $(document).on('click','button[id^=edit]',function(){
             var id = $(this).attr("id").split("-")[1]
