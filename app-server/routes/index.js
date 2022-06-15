@@ -11,18 +11,6 @@ const {spawn} = require('child_process');
 
 var upload = multer({ dest: "uploads/" });
 
-const walkSync = (dir, callback) => {
-  const files = fs.readdirSync(dir);
-  files.forEach((file) => {
-    var filepath = path.join(dir, file);
-    const stats = fs.statSync(filepath);
-    if (stats.isDirectory()) {
-      walkSync(filepath, callback);
-    } else if (stats.isFile()) {
-      callback(filepath, stats);
-    }
-  });
-};
 
 function verificaNivelConsumidor(req,res,next){
   autorizados = ["Consumidor","Produtor","Administrador"]
@@ -66,7 +54,7 @@ router.get("/recursos",verificaNivelConsumidor, function (req, res) {
 
 router.get("/projetos",verificaNivelConsumidor,function(req,res){
   axios.get("http://localhost:8001/api/projetos")
-      .then(data=>res.render("projetos",{projetos:data.data}))
+      .then(data=>res.render("projetos",{projetos:data.data,token:req.level}))
       .catch(error=>{res.render("error",{error:error})})
 })
 
@@ -75,22 +63,16 @@ router.get("/projetos/:id",verificaNivelConsumidor,function(req,res){
     console.log(hash)
     var firstHalf = hash.slice(0, 16);
     var secondHalf = hash.slice(16, 32);
-    var files = []
     var caminho = __dirname + "/../files/" + firstHalf + "/" + secondHalf+"/data"
-    const python = spawn('python3',[__dirname+"/../bagit.py", caminho, "download"])
+    const python = spawn('python3',[__dirname+"/../bagit.py", caminho, hash])
     python.on("exit",(code)=>{
-      res.download(__dirname+"/../download.zip")
-      // fs.unlinkSync(__dirname+"/../download.zip")
-      res.redirect("/projetos")
+      python.emit("done")
     })
-    // walkSync(__dirname + "/../files/" + firstHalf + "/" + secondHalf+"/data", (filepath,stats)=>{
-    //   // var inpath = "data"+filepath.split("data")[1]
-    //   files.push(filepath)
-    // })
-    // var manifest = {
-    //   encoding: "UTF-8",
-    //   algorithm: "sha256",
-    // }
+    python.on("done",()=>{
+      console.log(fs.existsSync(__dirname+"/../"+hash+".zip"))
+      res.download(__dirname+"/../"+hash+".zip")
+      res.status(200)
+    })
 })
 
 router.get("/upload", verificaNivelProdutor,function(req,res){
@@ -280,11 +262,28 @@ router.get("/editar",verificaNivelProdutor,function(req,res){
       .catch(error=>res.render("error",{error:error}))
 })
 
+router.delete("/deleteAdmin/:id",verificaNivelAdministrador,function(req,res){
+  axios.get("http://localhost:8001/api/recursos/"+req.params.id)
+      .then(data=>{
+          var ficheiro = data.data
+          var zipName = ficheiro.zip_name;
+          var hash = CryptoJs.MD5(
+            zipName + ficheiro.data_submissao.toString())
+          .toString();
+          var firstHalf = hash.slice(0, 16);
+          var secondHalf = hash.slice(16, 32);
+          fs.unlinkSync(__dirname+"/../files/"+firstHalf+"/"+secondHalf+"/"+ficheiro.path_recurso+ficheiro.nome_ficheiro)
+          axios.delete("http://localhost:8001/api/recursos/"+req.params.id)
+              .then(data=>res.redirect("/admin/recursos"))
+              .catch(error=>res.render("error",{error:error}))
+      })
+})
+
 router.delete("/delete/:id",verificaNivelProdutor,function(req,res){
   axios.get("http://localhost:8001/api/recursos/user/"+req.username)
       .then(data=>{
         var ids = data.data.map(ele=>ele._id)
-        if(!(req.level == "Administrador" || ids.includes(req.params.id))){          
+        if(!(req.level == "Administrador" || ids.includes(req.params.id))){
           res.redirect("/")
         } 
         else{

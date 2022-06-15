@@ -15,6 +15,7 @@ router.get("/",function(req,res){
   
 router.put("/",function(req,res){
   console.log(req.body)
+  //TODO: verificar se não existe o novo nome na bd
   User.alterar(req.body)
       .then(data=>res.status(200).jsonp(data))
       .catch(error=>res.status(504).jsonp({error:error}))
