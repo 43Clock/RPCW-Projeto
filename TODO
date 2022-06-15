@@ -2,6 +2,7 @@
 - Adicionar criacao/edicao/remoção de noticias para o admin
 - Adicionar as noticias na página princial (load n noticias, mchegando ao fim carrega-se mais com jquery - usar boockmarks para gravar o estado?)
 - Proteger API (proteger rotas)  -----
+- Adicionar logs
 
 
 - O hash é criado com a data de submissao? Os zips diferentes são inseridos, mas os ficheiros não são duplicados, por isso ao eliminar de 1 projeto, elimina-se de todos os projetos iguais
