@@ -311,7 +311,10 @@ router.get("/admin",verificaNivelAdministrador,function(req,res){
 
 router.get("/admin/utilizadores",verificaNivelAdministrador,function(req,res){
   axios.get("http://localhost:8002/users")
-    .then(data=>res.render("admin-utilizadores",{utilizadores:data.data,token:req.level}))
+    .then(data=>{
+      //console.log(data.data)
+      res.status(200).render("admin-utilizadores",{utilizadores:data.data,token:req.level})
+    })
     .catch(error=>res.render("error",{error:error}))
 })
 router.get("/admin/recursos",verificaNivelAdministrador,function(req,res){

@@ -18,6 +18,7 @@ block content
                         i(class="fas fa-chart-bar")
         div(id="display" class="w3-col m9")
             if(recursos.length > 0)
+                input(type="text" id="searchbar")
                 table.w3-table-all(id="tabela")
                     tr
                         th(id="0" onclick="sortTable(0)") Data
@@ -39,6 +40,12 @@ block content
                 p Ainda não há ficheiros armazenados...
 
     script.
+        $("#searchbar").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#tabela tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
             
             var lastColumn = undefined
             var lastLevel = undefined
