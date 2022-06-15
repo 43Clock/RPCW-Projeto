@@ -6,14 +6,26 @@ block content
       h2 Novo Ficheiro 
     form.w3-container(action="/upload" method="POST" enctype="multipart/form-data")
       .w3-container(id="lista")
-        if(erro)
-          p.w3-red.w3-center=erro
+        div.visible(id="report")
+          if(erro)
+            p.w3-red.w3-center=erro
+          else
+            if(sucesso)
+              p.w3-green.w3-center=sucesso
         .w3-container(id="f1")
           .w3-cell-row 
             label.w3-cell Ficheiro:  
             input.w3-input.w3-cell.w3-border.w3-margin-top(type="file" name="zip" required)
       .w3-cell-row
         button.w3-button.w3-round-large.w3-deep-purple.w3-margin(type="submit" value="Enviar") Enviar
+
+  script.
+    // close the div in 5 secs
+    window.setTimeout("closereport();", 5000);
+
+    function closereport(){
+      document.getElementById("report").style.display=" none";
+    }
 
     //- .w3-card-4.modal(id="display")
 

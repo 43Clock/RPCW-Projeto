@@ -1,0 +1,139 @@
+extends layout
+
+block content
+    div(class="w3-row-padding")
+        div(class="w3-col m3 w3-border-right")
+            div(class="w3-bar-block")
+                button(id="users" class="w3-bar-item w3-button") Utilizadores 
+                    i(class="fas fa-user")
+                button(id="recursos" class="w3-bar-item w3-button") Recursos 
+                    i(class="fas fa-file")
+                button(id="logs" class="w3-bar-item w3-button") Logs 
+                    i(class="fas fa-edit")
+                button(id="stats" class="w3-bar-item w3-button") Estatisticas 
+                    i(class="fas fa-chart-bar")
+        div(id="display" class="w3-col m9")
+
+    script.
+        $(function () {
+            //---------------------------------users' scripts------------------------
+            $("#users").click(function(){
+                $("#display").empty()
+                $.get("http://localhost:8002/users",function(data){
+                    var utilizadores = data.dados
+                   
+                    //@TODO: criar primeiro tabela com um id
+                    var tabela = `
+                    <table class="w3-table-all" id="tabela">
+                        <tr>
+                            <th>username</td>
+                            <th>level</td>
+                            <th>edit</td>
+                            <th>remove</td>
+                        </tr>
+                    `
+                    utilizadores.forEach(elem=>{
+                        tabela+=`
+                        <tr id="${elem.username}">
+                            <td>${elem.username}</td>
+                            <td id="tipo-${elem._id}>${elem.level}</td>
+                            <td>
+                                <button id="edit-${elem._id}" class="w3-button w3-round-large w3-tiny w3-blue">
+                                    <i class="fa fa-pen">
+                            </td>
+                            <td>
+                                <button id="remove-${elem._id} class="w3-button w3-round-large w3-tiny w3-red">
+                                    <i class="fa fa-trash">
+                            </td>
+                        </tr>
+                        `
+                    })
+                    tabela+=`
+                    </tabela>
+                    `
+
+
+                    $("#display").append(tabela)
+                    //@TODO: dps adicionar a tabela com id x os users todos com butoes para se poder alterar
+                    //meter botao com id do tipo editar-id_user, ver o que fiz no editar deve ser +- parecido
+                })
+            })
+
+            $(document).on('click','button[id^=edit]',function(){
+                var id = $(this).attr("id").split("-")[1]
+                if(lastId){
+                    $("#row-"+lastId).children("td:eq(4)").remove()
+                    $("#row-"+lastId).children("td:eq(4)").remove()
+                    $("#row-"+lastId).append('<td><button id="edit-'+lastId +'" class="w3-button w3-round-large w3-tiny w3-blue"><i class="fa fa-pen"></i></button></td>')
+                    $("#row-"+lastId).append('<td><button id="remove-'+lastId+'" class="w3-button w3-round-large w3-tiny w3-red">Remover</button></td>')
+                    $("#tipo-"+lastId).html(lastText)
+                }
+                $("#row-"+id).children("td:eq(-1)").remove()
+                $("#row-"+id).children("td:eq(-1)").remove()
+                $("#row-"+id).append('<td><button id="accept-'+id+'" class="w3-button w3-round-large w3-tiny w3-green"><i class="fa fa-check"></i></button></td>')
+                $("#row-"+id).append('<td><button id="cancel-'+id+'" class="w3-button w3-round-large w3-tiny w3-red"><i class="fa fa-times"></i></button></td>')
+                var text = $("#tipo-"+id).text()
+                lastText = text
+                $("#tipo-"+id).html('<select id="select-'+id+'" class="w3-select" name="tipo"><option value="Teste/Exame">Teste/Exame</option><option value="Slides">Slides</option><option value="Manual">Manual</option><option value="Tese de Mestrado">Tese de Mestrado</option><option value="Outro">Outro</option></select>')
+                lastId = id
+            })
+
+            $(document).on('click','button[id^=cancel]',function(){
+                var id = $(this).attr("id").split("-")[1]
+                console.log($(this))
+                $("#row-"+id).children("td:eq(4)").remove()
+                $("#row-"+id).children("td:eq(4)").remove()
+                $("#row-"+id).append('<td><button id="edit-'+id+'" class="w3-button w3-round-large w3-tiny w3-blue"><i class="fa fa-pen"></i></button></td>')
+                $("#row-"+id).append('<td><button id="remove-'+id+'" class="w3-button w3-round-large w3-tiny w3-red">Remover</button></td>')
+                $("#tipo-"+id).html(lastText)
+                lastId = undefined
+            })
+
+            $(document).on('click','button[id^=accept]',function(){
+                var id = $(this).attr("id").split("-")[1]
+                $("#row-"+id).children("td:eq(4)").remove()
+                $("#row-"+id).children("td:eq(4)").remove()
+                $("#row-"+id).append('<td><button id="edit-'+id+'" class="w3-button w3-round-large w3-tiny w3-blue"><i class="fa fa-pen"></i></button></td>')
+                var valor = $("#select-"+id+" option:selected").val()
+                $("#tipo-"+id).text(valor)
+                lastId = undefined
+                if(valor != lastText){
+                    var data = {}
+                    data["tipo_recurso"] = valor
+                    $.ajax({
+                        url:"http://localhost:8001/api/recursos/"+id,
+                        type: 'PUT',
+                        contentType: 'application/json',
+                        data: JSON.stringify(data),
+                        success: function(){
+                            location.reload()
+                        },
+                        error: function(){
+                            location.reload()
+                        }
+                    })
+                }
+            })
+
+            $(document).on('click','button[id^=remove]',function(){
+                var id = $(this).attr("id").split("-")[1]
+                lastId = undefined
+                var data = {}
+                $.ajax({
+                    url:"http://localhost:8003/delete/"+id,
+                    type: 'DELETE',
+                    success: function(){
+                        location.reload()
+                    },
+                    error: function(){
+                        location.reload()
+                    }
+                })
+                
+            })
+
+
+
+            //---------------------------simulate click----------------------------
+            $("#users").trigger("click");
+        })

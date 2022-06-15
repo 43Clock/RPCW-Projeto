@@ -35,7 +35,7 @@ function verificaNivelAdministrador(req,res,next){
 }
 
 router.get("/",function(req,res){
-  res.redirect("/login")
+  res.render("index",{token:req.level})
 })
 
 
@@ -51,7 +51,7 @@ router.get("/recursos",verificaNivelConsumidor, function (req, res) {
 });
 
 router.get("/upload", verificaNivelProdutor,function(req,res){
-  res.render("upload",{token:req.level,erro:req.query.erro})
+  res.render("upload",{token:req.level,erro:req.query.erro,sucesso:req.query.sucesso})
 })
 
 router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req, res) {
@@ -139,7 +139,7 @@ router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req,
               }
             });
             console.log(oldPath)
-            res.redirect("/upload")
+            res.redirect("/upload?sucesso="+"Ficheiro inserido")
           } 
           //Caso de não ter todos os ficheiros
         else {
@@ -261,7 +261,20 @@ router.delete("/delete/:id",verificaNivelProdutor,function(req,res){
 })
 
 router.get("/admin",verificaNivelAdministrador,function(req,res){
-  res.render("admin")
+  res.redirect("/admin/utilizadores")
+})
+
+router.get("/admin/utilizadores",verificaNivelAdministrador,function(req,res){
+  res.render("admin-utilizadores",{token:req.level})
+})
+router.get("/admin/recursos",verificaNivelAdministrador,function(req,res){
+  res.render("admin-recursos",{token:req.level})
+})
+router.get("/admin/logs",verificaNivelAdministrador,function(req,res){
+  res.render("admin-logs",{token:req.level})
+})
+router.get("/admin/estatisticas",verificaNivelAdministrador,function(req,res){
+  res.render("admin-estatisticas",{token:req.level})
 })
 
 router.get("/logout",function(req,res){
