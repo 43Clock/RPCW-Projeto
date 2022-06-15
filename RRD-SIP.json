@@ -1,0 +1,18 @@
+{
+    "encoding": "UTF-8",
+    "algorithm": "sha256",
+    "data": [
+        {
+            "checksum": "c7ba77c756f87df4e04ef86fe0ca9d727c32e4b2c3bd11621aa7a3dc8264e812",
+            "path": "data/ficha-pri-avaliacao2020.xml"
+        },
+        {
+            "checksum": "90b04990bf225c46c9f62afeaa5b074fa42fbdea0490fb49c2e201d43d0d3243",
+            "path": "data/prc2021-ficha-aferic\u0327a\u0303o.xml"
+        },
+        {
+            "checksum": "97902cd5d9c3ad54347fd565749ca01a72fdcef75d2cb9d068301feff9a027b1",
+            "path": "data/pl2015-ficha2.xml"
+        }
+    ]
+}

@@ -6,16 +6,18 @@ var passport = require('passport')
 
 var User = require('../controllers/user')
 
-router.get('/', function(req, res){
-  User.listar()
-    .then(dados => res.status(200).jsonp({dados: dados}))
-    .catch(e => res.status(500).jsonp({error: e}))
-})
 
-router.post('/', function(req, res){
-  User.inserir(req.body)
-    .then(dados => res.status(201).jsonp({dados: dados}))
-    .catch(e => res.status(500).jsonp({error: e}))
+router.get("/",function(req,res){
+  User.listar()
+      .then(data=>res.status(200).jsonp(data))
+      .catch(error=>res.status(504).jsonp({error:error}))
+})
+  
+router.put("/",function(req,res){
+  console.log(req.body)
+  User.alterar(req.body)
+      .then(data=>res.status(200).jsonp(data))
+      .catch(error=>res.status(504).jsonp({error:error}))
 })
   
 router.post('/login', function(req,res,next){
@@ -52,9 +54,6 @@ router.post("/registar",function(req,res){
       .catch(error=>res.status(502).jsonp({error:error}))
 })
 
-router.get("users",function(req,res){
-  User.listar()
-      .then(data=>res.status(200).jsonp(data))
-      .catch(error=>res.status(504).jsonp({error:error}))
-})
+
+
 module.exports = router;

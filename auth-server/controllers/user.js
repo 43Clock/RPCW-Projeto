@@ -1,5 +1,5 @@
 // Controlador para o modelo User
-
+const mongoose = require('mongoose');
 var User = require('../models/user')
 
 // Devolve a lista de Users
@@ -25,5 +25,5 @@ module.exports.remover = function(uname){
 }
 
 module.exports.alterar = function(u){
-    return User.findByIdAndUpdate({username: u.username}, u, {new: true})
+    return User.findByIdAndUpdate({_id: mongoose.Types.ObjectId(u._id)}, {username:u.username,level:u.level}, {new: true})
 }

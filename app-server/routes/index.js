@@ -6,8 +6,23 @@ var AdmZip = require("adm-zip");
 var CryptoJs = require("crypto-js");
 const fs = require("fs");
 const bcrypt = require("bcrypt");
+const path = require('path');
+const {spawn} = require('child_process');
 
 var upload = multer({ dest: "uploads/" });
+
+const walkSync = (dir, callback) => {
+  const files = fs.readdirSync(dir);
+  files.forEach((file) => {
+    var filepath = path.join(dir, file);
+    const stats = fs.statSync(filepath);
+    if (stats.isDirectory()) {
+      walkSync(filepath, callback);
+    } else if (stats.isFile()) {
+      callback(filepath, stats);
+    }
+  });
+};
 
 function verificaNivelConsumidor(req,res,next){
   autorizados = ["Consumidor","Produtor","Administrador"]
@@ -47,8 +62,36 @@ router.get("/recursos",verificaNivelConsumidor, function (req, res) {
       .catch(error=>{
         res.render("error",{error:error})
       })
-
 });
+
+router.get("/projetos",verificaNivelConsumidor,function(req,res){
+  axios.get("http://localhost:8001/api/projetos")
+      .then(data=>res.render("projetos",{projetos:data.data}))
+      .catch(error=>{res.render("error",{error:error})})
+})
+
+router.get("/projetos/:id",verificaNivelConsumidor,function(req,res){
+    var hash = CryptoJs.MD5(req.params.id).toString();
+    console.log(hash)
+    var firstHalf = hash.slice(0, 16);
+    var secondHalf = hash.slice(16, 32);
+    var files = []
+    var caminho = __dirname + "/../files/" + firstHalf + "/" + secondHalf+"/data"
+    const python = spawn('python3',[__dirname+"/../bagit.py", caminho, "download"])
+    python.on("exit",(code)=>{
+      res.download(__dirname+"/../download.zip")
+      // fs.unlinkSync(__dirname+"/../download.zip")
+      res.redirect("/projetos")
+    })
+    // walkSync(__dirname + "/../files/" + firstHalf + "/" + secondHalf+"/data", (filepath,stats)=>{
+    //   // var inpath = "data"+filepath.split("data")[1]
+    //   files.push(filepath)
+    // })
+    // var manifest = {
+    //   encoding: "UTF-8",
+    //   algorithm: "sha256",
+    // }
+})
 
 router.get("/upload", verificaNivelProdutor,function(req,res){
   res.render("upload",{token:req.level,erro:req.query.erro,sucesso:req.query.sucesso})
@@ -105,6 +148,7 @@ router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req,
             if (!fs.existsSync( __dirname + "/../files/" + firstHalf + "/" + secondHalf)) {
               fs.mkdirSync(__dirname + "/../files/" + firstHalf + "/" + secondHalf,{ recursive: true });
             }
+            
             zipEntries.forEach((file) => {
               if(file.name != "RRD-SIP.json" && file.name != "metadados.json"){
                 var split = file.entryName.split("/");
@@ -155,6 +199,7 @@ router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req,
   }
 });
 
+
 router.get("/download/:id", verificaNivelConsumidor, function(req,res){
   var id = req.params.id
   axios.get("http://localhost:8001/api/recursos/"+id)
@@ -182,6 +227,7 @@ router.get("/login",function(req,res){
 
 router.post("/login",function(req,res){
   req.body.username = req.body.username.toLowerCase()
+  console.log(req.body)
   axios.post('http://localhost:8002/users/login', req.body)
     .then(dados => {
       res.cookie('token', dados.data.token, {
@@ -261,14 +307,18 @@ router.delete("/delete/:id",verificaNivelProdutor,function(req,res){
 })
 
 router.get("/admin",verificaNivelAdministrador,function(req,res){
-  res.redirect("/admin/utilizadores")
+  res.render("admin-original")
 })
 
 router.get("/admin/utilizadores",verificaNivelAdministrador,function(req,res){
-  res.render("admin-utilizadores",{token:req.level})
+  axios.get("http://localhost:8002/users")
+    .then(data=>res.render("admin-utilizadores",{utilizadores:data.data,token:req.level}))
+    .catch(error=>res.render("error",{error:error}))
 })
 router.get("/admin/recursos",verificaNivelAdministrador,function(req,res){
-  res.render("admin-recursos",{token:req.level})
+  axios.get("http://localhost:8001/api/recursos")
+       .then(data=>res.render("admin-recursos",{token:req.level,recursos:data.data}))
+       .catch(error=>res.render("error",{error:error}))
 })
 router.get("/admin/logs",verificaNivelAdministrador,function(req,res){
   res.render("admin-logs",{token:req.level})
@@ -283,49 +333,5 @@ router.get("/logout",function(req,res){
   res.redirect("/login")
 })
 
-/*
-//To replace
-var fs = require('fs');
-var dir = './tmp/but/then/nested';
 
-if (!fs.existsSync(dir)){
-    fs.mkdirSync(dir, { recursive: true });
-}*/
-
-// router.get('/login', function(req, res) {
-//   res.render('login-form');
-// });
-
-// router.post('/login', function(req, res) {
-//   axios.post('http://localhost:8002/users/login', req.body)
-//     .then(dados => {
-//       res.cookie('token', dados.data.token, {
-//         expires: new Date(Date.now() + '1d'),
-//         secure: false, // set to true if your using https
-//         httpOnly: true
-//       });
-//       res.redirect('/tarefas')
-//     })
-//     .catch(e => res.render('error', {error: e}))
-// });
-
-// router.get('/tarefas', function(req, res) {
-//   console.log(JSON.stringify(req.cookies))
-//   axios.get('http://localhost:8001/tarefas?token=' + req.cookies.token)
-//     .then(dados => {
-//         res.render('tarefas', {lista: dados.data})
-//     })
-//     .catch(e => res.render('error', {error: e}))
-// });
-
-// router.get('/tarefas/remover/:id', function(req, res){
-//   axios.delete("http://localhost:8001/tarefas/"+req.params.id+"?token="+req.cookies.token)
-//         .then(data => res.redirect("/tarefas"))
-//         .catch(e => {
-//           if(e.response.status == 403){
-//             res.render("error-level")
-//           }
-//           else
-//             res.render('error', {error: e})})
-//       })
 module.exports = router;

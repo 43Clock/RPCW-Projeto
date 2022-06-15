@@ -2,110 +2,147 @@ extends layout
 
 block content
     div(class="w3-row-padding")
-        div(class="w3-col m3 w3-border-right")
+        div(class="w3-col m2 w3-border-right")
             div(class="w3-bar-block")
-                a(href="http://localhost:8003/admin/utilizadores")
+                a(style="text-decoration: none" href="/admin/utilizadores")
                     button(id="users" class="w3-bar-item w3-button") Utilizadores 
                         i(class="fas fa-user")
-                a(href="http://localhost:8003/admin/recursos")
-                    button(id="recursos" class="w3-bar-item w3-button") Recursos 
+                a(style="text-decoration: none" href="/admin/recursos")
+                    button(id="recursos" class="w3-bar-item  w3-button") Recursos 
                         i(class="fas fa-file")
-                a(href="http://localhost:8003/admin/logs")
+                a(style="text-decoration: none" href="/admin/logs")
                     button(id="logs" class="w3-bar-item w3-button") Logs 
                         i(class="fas fa-edit")
-                a(href="http://localhost:8003/admin/estatisticas")
+                a(style="text-decoration: none" href="/admin/estatisticas")
                     button(id="stats" class="w3-bar-item w3-button") Estatisticas 
                         i(class="fas fa-chart-bar")
         div(id="display" class="w3-col m9")
-
+            table.w3-table-all(id="tabela")
+                tr
+                    th(id="0" onclick="sortTable(0)") Username
+                    th(id="1" onclick="sortTable(1)") Level
+                    th Editar
+                    th Remover
+                for user in utilizadores
+                    tr(id="row-"+user._id)
+                        td(id="username-"+user._id)=user.username
+                        td(id="level-"+user._id)=user.level
+                        td
+                            button(id="edit-"+user._id class="w3-button w3-round-large w3-tiny w3-blue")
+                                i(class="fa fa-pen")
+                        td
+                            button(id="remove-"+user._id class="w3-button w3-round-large w3-tiny w3-red") Remover
     script.
-        $(function () {
-            //---------------------------------users' scripts------------------------
-            $("#users").click(function(){
-                $("#display").empty()
-                $.get("http://localhost:8002/users",function(data){
-                    var utilizadores = data.dados
-                   
-                    //@TODO: criar primeiro tabela com um id
-                    var tabela = `
-                    <table class="w3-table-all" id="tabela">
-                        <tr>
-                            <th>username</td>
-                            <th>level</td>
-                            <th>edit</td>
-                            <th>remove</td>
-                        </tr>
-                    `
-                    utilizadores.forEach(elem=>{
-                        tabela+=`
-                        <tr id="${elem.username}">
-                            <td>${elem.username}</td>
-                            <td id="tipo-${elem._id}>${elem.level}</td>
-                            <td>
-                                <button id="edit-${elem._id}" class="w3-button w3-round-large w3-tiny w3-blue">
-                                    <i class="fa fa-pen">
-                            </td>
-                            <td>
-                                <button id="remove-${elem._id} class="w3-button w3-round-large w3-tiny w3-red">
-                                    <i class="fa fa-trash">
-                            </td>
-                        </tr>
-                        `
-                    })
-                    tabela+=`
-                    </tabela>
-                    `
+            
+            var lastColumn = undefined
+            var lastLevel = undefined
+            var lastUsername = undefined
+            var lastId = undefined
 
-
-                    $("#display").append(tabela)
-                    //@TODO: dps adicionar a tabela com id x os users todos com butoes para se poder alterar
-                    //meter botao com id do tipo editar-id_user, ver o que fiz no editar deve ser +- parecido
-                })
-            })
+            function sortTable(n){
+                var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+                table = document.getElementById("tabela");
+                switching = true;
+                dir = "asc";
+                while (switching) {
+                    switching = false;
+                    rows = table.rows;
+                    for (i = 1; i < (rows.length - 1); i++) {
+                        shouldSwitch = false;
+                        x = rows[i].getElementsByTagName("TD")[n];
+                        y = rows[i + 1].getElementsByTagName("TD")[n];
+                        if (dir == "asc") {
+                            if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        } 
+                        else if (dir == "desc") {
+                            if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (shouldSwitch) {
+                        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                        switching = true;
+                        switchcount ++;
+                    } else {
+                        if (switchcount == 0 && dir == "asc") {
+                            dir = "desc";
+                            switching = true;
+                        }
+                    }
+                }
+                if(lastColumn!=undefined){
+                    var temp = rows[0].getElementsByTagName("th")[lastColumn].innerHTML
+                    var tempSplit = temp.toString().split(" ")
+                    rows[0].getElementsByTagName("th")[lastColumn].innerHTML = tempSplit[0]
+                }
+                var th = rows[0].getElementsByTagName("th")[n].innerHTML
+                var split = th.toString().split(" ")
+                if(dir == "asc"){
+                    rows[0].getElementsByTagName("th")[n].innerHTML = split[0] +" ▲"
+                }else{
+                    rows[0].getElementsByTagName("th")[n].innerHTML = split[0] +" ▼"
+                }
+                lastColumn = n;
+            }
 
             $(document).on('click','button[id^=edit]',function(){
                 var id = $(this).attr("id").split("-")[1]
                 if(lastId){
-                    $("#row-"+lastId).children("td:eq(4)").remove()
-                    $("#row-"+lastId).children("td:eq(4)").remove()
+                    $("#row-"+lastId).children("td:eq(-1)").remove()
+                    $("#row-"+lastId).children("td:eq(-1)").remove()
                     $("#row-"+lastId).append('<td><button id="edit-'+lastId +'" class="w3-button w3-round-large w3-tiny w3-blue"><i class="fa fa-pen"></i></button></td>')
                     $("#row-"+lastId).append('<td><button id="remove-'+lastId+'" class="w3-button w3-round-large w3-tiny w3-red">Remover</button></td>')
-                    $("#tipo-"+lastId).html(lastText)
+                    $("#level-"+lastId).html(lastLevel)
+                    $("#username-"+lastId).html(lastUsername)
                 }
                 $("#row-"+id).children("td:eq(-1)").remove()
                 $("#row-"+id).children("td:eq(-1)").remove()
                 $("#row-"+id).append('<td><button id="accept-'+id+'" class="w3-button w3-round-large w3-tiny w3-green"><i class="fa fa-check"></i></button></td>')
                 $("#row-"+id).append('<td><button id="cancel-'+id+'" class="w3-button w3-round-large w3-tiny w3-red"><i class="fa fa-times"></i></button></td>')
-                var text = $("#tipo-"+id).text()
-                lastText = text
-                $("#tipo-"+id).html('<select id="select-'+id+'" class="w3-select" name="tipo"><option value="Teste/Exame">Teste/Exame</option><option value="Slides">Slides</option><option value="Manual">Manual</option><option value="Tese de Mestrado">Tese de Mestrado</option><option value="Outro">Outro</option></select>')
+                var level = $("#level-"+id).text()
+                var username = $("#username-"+id).text()
+                lastLevel = level
+                lastUsername = username
+                $("#level-"+id).html('<select id="select-'+id+'" class="w3-select" name="tipo"><option value="Consumidor">Consumidor</option><option value="Produtor">Produtor</option><option value="Administrador">Administrador</option></select>')
+                $("#username-"+id).html('<p><input id="input-'+id+'" class="w3-input" type="text" value="'+username+'"></p>')
                 lastId = id
             })
 
             $(document).on('click','button[id^=cancel]',function(){
                 var id = $(this).attr("id").split("-")[1]
                 console.log($(this))
-                $("#row-"+id).children("td:eq(4)").remove()
-                $("#row-"+id).children("td:eq(4)").remove()
+                $("#row-"+id).children("td:eq(-1)").remove()
+                $("#row-"+id).children("td:eq(-1)").remove()
                 $("#row-"+id).append('<td><button id="edit-'+id+'" class="w3-button w3-round-large w3-tiny w3-blue"><i class="fa fa-pen"></i></button></td>')
                 $("#row-"+id).append('<td><button id="remove-'+id+'" class="w3-button w3-round-large w3-tiny w3-red">Remover</button></td>')
-                $("#tipo-"+id).html(lastText)
+                $("#level-"+id).html(lastLevel)
+                $("#username-"+id).html(lastUsername)
                 lastId = undefined
             })
 
             $(document).on('click','button[id^=accept]',function(){
                 var id = $(this).attr("id").split("-")[1]
-                $("#row-"+id).children("td:eq(4)").remove()
-                $("#row-"+id).children("td:eq(4)").remove()
+                $("#row-"+id).children("td:eq(-1)").remove()
+                $("#row-"+id).children("td:eq(-1)").remove()
                 $("#row-"+id).append('<td><button id="edit-'+id+'" class="w3-button w3-round-large w3-tiny w3-blue"><i class="fa fa-pen"></i></button></td>')
-                var valor = $("#select-"+id+" option:selected").val()
-                $("#tipo-"+id).text(valor)
+                var level = $("#select-"+id+" option:selected").val()
+                var username = $("#input-"+id).val()
+                $("#level-"+id).text(level)
                 lastId = undefined
-                if(valor != lastText){
+                if(level != lastLevel || username != lastUsername ){
                     var data = {}
-                    data["tipo_recurso"] = valor
+                    data["_id"] = id
+                    if(username!= lastUsername) data["username"] = username
+                    else data["username"] = lastUsername
+                    if(level != lastLevel) data["level"] = level
+                    else data["level"] = lastLevel
                     $.ajax({
-                        url:"http://localhost:8001/api/recursos/"+id,
+                        url:"http://localhost:8002/users",
                         type: 'PUT',
                         contentType: 'application/json',
                         data: JSON.stringify(data),
@@ -137,6 +174,3 @@ block content
             })
 
 
-
-            //---------------------------simulate click----------------------------
-        })

@@ -88,8 +88,8 @@ block content
     $(document).on('click','button[id^=edit]',function(){
         var id = $(this).attr("id").split("-")[1]
         if(lastId){
-            $("#row-"+lastId).children("td:eq(4)").remove()
-            $("#row-"+lastId).children("td:eq(4)").remove()
+            $("#row-"+lastId).children("td:eq(-1)").remove()
+            $("#row-"+lastId).children("td:eq(-1)").remove()
             $("#row-"+lastId).append('<td><button id="edit-'+lastId +'" class="w3-button w3-round-large w3-tiny w3-blue"><i class="fa fa-pen"></i></button></td>')
             $("#row-"+lastId).append('<td><button id="remove-'+lastId+'" class="w3-button w3-round-large w3-tiny w3-red">Remover</button></td>')
             $("#tipo-"+lastId).html(lastText)
@@ -107,8 +107,8 @@ block content
     $(document).on('click','button[id^=cancel]',function(){
         var id = $(this).attr("id").split("-")[1]
         console.log($(this))
-        $("#row-"+id).children("td:eq(4)").remove()
-        $("#row-"+id).children("td:eq(4)").remove()
+        $("#row-"+id).children("td:eq(-1)").remove()
+        $("#row-"+id).children("td:eq(-1)").remove()
         $("#row-"+id).append('<td><button id="edit-'+id+'" class="w3-button w3-round-large w3-tiny w3-blue"><i class="fa fa-pen"></i></button></td>')
         $("#row-"+id).append('<td><button id="remove-'+id+'" class="w3-button w3-round-large w3-tiny w3-red">Remover</button></td>')
         $("#tipo-"+id).html(lastText)

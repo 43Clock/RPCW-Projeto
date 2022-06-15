@@ -3,13 +3,23 @@ var express = require('express');
 var router = express.Router();
 const Ficheiro = require('../controllers/ficheiro')
 
-function verificaNivel(autorizados,req,res,next){
-  autorizados = ["admin"]
-  if(autorizados.includes(req.level))
-    next()
-  else
-    res.status(403).jsonp({eroor: "Não tem nível de acesso suficiente"})
-}
+
+router.get("/projetos",function(req,res){
+  Ficheiro.listar()
+          .then(dados=>{
+            var uploadsUnicos = [...new Map(dados.map(item=> [item["data_submissao"],item])).values()]
+            var data = []
+            uploadsUnicos.forEach(ele=>{
+              data.push({
+                data_submissao: ele.data_submissao,
+                id_submissor: ele.id_submissor,
+                zip_name: ele.zip_name,
+                titulo_recurso:ele.titulo_recurso
+              })
+            })
+            res.status(200).jsonp(data)
+          })
+})
 
 router.get("/recursos",function(req,res){
   Ficheiro.listar()
