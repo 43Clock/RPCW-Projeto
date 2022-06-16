@@ -1,44 +1,28 @@
-extends layout
+extends admin-layout
 
-block content
-    div(class="w3-row-padding")
-        div(class="w3-col m2 w3-border-right")
-            div(class="w3-bar-block")
-                a(style="text-decoration: none" href="/admin/utilizadores")
-                    button(id="users" class="w3-bar-item w3-button") Utilizadores 
-                        i(class="fas fa-user")
-                a(style="text-decoration: none" href="/admin/recursos")
-                    button(id="recursos" class="w3-bar-item  w3-button") Recursos 
-                        i(class="fas fa-file")
-                a(style="text-decoration: none" href="/admin/logs")
-                    button(id="logs" class="w3-bar-item w3-button") Logs 
-                        i(class="fas fa-edit")
-                a(style="text-decoration: none" href="/admin/estatisticas")
-                    button(id="stats" class="w3-bar-item w3-button") Estatisticas 
-                        i(class="fas fa-chart-bar")
-        div(id="display" class="w3-col m9")
-            if(recursos.length > 0)
-                input(type="text" id="searchbar")
-                table.w3-table-all(id="tabela")
-                    tr
-                        th(id="0" onclick="sortTable(0)") Data
-                        th(id="1" onclick="sortTable(1)") Ficheiro
-                        th(id="2" onclick="sortTable(2)") Titulo Recurso
-                        th(id="3" onclick="sortTable(3)") Tipo
-                    tbody(id="myTable")
-                        each f in recursos
-                            tr(id="row-"+f._id)
-                                td=f.data_submissao
-                                td=f.nome_ficheiro
-                                td=f.titulo_recurso
-                                td(id="tipo-"+f._id)=f.tipo_recurso
-                                td
-                                    button(id="edit-"+f._id class="w3-button w3-round-large w3-tiny w3-blue")
-                                        i(class="fa fa-pen")
-                                td
-                                    button(id="remove-"+f._id class="w3-button w3-round-large w3-tiny w3-red") Remover
-            else
-                p Ainda não há ficheiros armazenados...
+block content-admin
+    if(recursos.length > 0)
+        input(type="text" id="searchbar")
+        table.w3-table-all(id="tabela")
+            tr
+                th(id="0" onclick="sortTable(0)") Data
+                th(id="1" onclick="sortTable(1)") Ficheiro
+                th(id="2" onclick="sortTable(2)") Titulo Recurso
+                th(id="3" onclick="sortTable(3)") Tipo
+            tbody(id="myTable")
+                each f in recursos
+                    tr(id="row-"+f._id)
+                        td=f.data_submissao
+                        td=f.nome_ficheiro
+                        td=f.titulo_recurso
+                        td(id="tipo-"+f._id)=f.tipo_recurso
+                        td
+                            button(id="edit-"+f._id class="w3-button w3-round-large w3-tiny w3-blue")
+                                i(class="fa fa-pen")
+                        td
+                            button(id="remove-"+f._id class="w3-button w3-round-large w3-tiny w3-red") Remover
+    else
+        p Ainda não há ficheiros armazenados...
 
     script.
         $("#searchbar").on("keyup", function() {

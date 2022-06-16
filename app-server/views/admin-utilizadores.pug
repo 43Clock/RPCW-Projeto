@@ -1,40 +1,24 @@
-extends layout
+extends admin-layout
 
-block content
-    div(class="w3-row-padding")
-        div(class="w3-col m2 w3-border-right")
-            div(class="w3-bar-block")
-                a(style="text-decoration: none" href="/admin/utilizadores")
-                    button(id="users" class="w3-bar-item w3-button") Utilizadores 
-                        i(class="fas fa-user")
-                a(style="text-decoration: none" href="/admin/recursos")
-                    button(id="recursos" class="w3-bar-item  w3-button") Recursos 
-                        i(class="fas fa-file")
-                a(style="text-decoration: none" href="/admin/logs")
-                    button(id="logs" class="w3-bar-item w3-button") Logs 
-                        i(class="fas fa-edit")
-                a(style="text-decoration: none" href="/admin/estatisticas")
-                    button(id="stats" class="w3-bar-item w3-button") Estatisticas 
-                        i(class="fas fa-chart-bar")
-        div(id="display" class="w3-col m9")
-            input(type="text" id="searchbar")
-            table.w3-table-all(id="tabela")
-                thead
-                    tr
-                        th(id="0" onclick="sortTable(0)") Username
-                        th(id="1" onclick="sortTable(1)") Level
-                        th Editar
-                        th Remover
-                <tbody id="myTable">
-                each user in utilizadores
-                    tr(id="row-"+user._id)
-                        td(id="username-"+user._id)=user.username
-                        td(id="level-"+user._id)=user.level
-                        td
-                            button(id="edit-"+user._id class="w3-button w3-round-large w3-tiny w3-blue")
-                                i(class="fa fa-pen")
-                        td
-                            button(id="remove-"+user._id class="w3-button w3-round-large w3-tiny w3-red") Remover
+block content-admin
+    input(type="text" id="searchbar")
+    table.w3-table-all(id="tabela")
+        thead
+            tr
+                th(id="0" onclick="sortTable(0)") Username
+                th(id="1" onclick="sortTable(1)") Level
+                th Editar
+                th Remover
+        tbody(id="myTable")
+            each user in utilizadores
+                tr(id="row-"+user._id)
+                    td(id="username-"+user._id)=user.username
+                    td(id="level-"+user._id)=user.level
+                    td
+                        button(id="edit-"+user._id class="w3-button w3-round-large w3-tiny w3-blue")
+                            i(class="fa fa-pen")
+                    td
+                        button(id="remove-"+user._id class="w3-button w3-round-large w3-tiny w3-red") Remover
     script.
         
         $("#searchbar").on("keyup", function() {
