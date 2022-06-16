@@ -45,17 +45,17 @@ router.get("/",function(req,res){
 router.get("/recursos",verificaNivelConsumidor, function (req, res) {
   axios.get("http://localhost:8001/api/recursos")
       .then(dados=>{
-        res.render("recursos",{ficheiros:dados.data,token:req.level});  
+        res.render("recursos",{ficheiros:dados.data,token:req.level,user:req.username});  
       })
       .catch(error=>{
-        res.render("error",{error:error})
+        res.render("error",{error:error,token:req.level})
       })
 });
 
 router.get("/projetos",verificaNivelConsumidor,function(req,res){
   axios.get("http://localhost:8001/api/projetos")
-      .then(data=>res.render("projetos",{projetos:data.data,token:req.level}))
-      .catch(error=>{res.render("error",{error:error})})
+      .then(data=>res.render("projetos",{projetos:data.data.projetos,ficheiros:data.data.ficheiros,token:req.level}))
+      .catch(error=>{res.render("error",{error:error,token:req.level})})
 })
 
 router.get("/projetos/:id",verificaNivelConsumidor,function(req,res){
@@ -160,7 +160,7 @@ router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req,
                       console.log(resposta.data)
                     })
                     .catch(error=>{
-                      res.render("erro")
+                      res.render("erro",{error:error,token:req.level})
                     })
               }
             });
@@ -199,7 +199,7 @@ router.get("/download/:id", verificaNivelConsumidor, function(req,res){
           res.status(200)
       })
       .catch(error=>{
-        res.render("error",{error:error})
+        res.render("error",{error:error,token:req.level})
       })
 })
 
@@ -224,7 +224,7 @@ router.post("/login",function(req,res){
       if(error.response.status == 409 || error.response.status == 401){
         res.status(error.response.status).redirect("/login?erro="+error.response.data.erro)
       }else{
-        res.render("error",{error:error})
+        res.render("error",{error:error,token:req.level})
       }
     })
 });
@@ -249,7 +249,7 @@ router.post("/registar",function(req,res){
         if(error.response.status == 409){
           res.status(409).redirect("/registar?erro="+error.response.data.erro)
         }else{
-          res.render("error",{error:error})
+          res.render("error",{error:error,token:req.level})
         }
       })
 })
@@ -259,7 +259,7 @@ router.get("/editar",verificaNivelProdutor,function(req,res){
       .then(data=>{
         res.render("editar",{ficheiros:data.data,token:req.level})
       })
-      .catch(error=>res.render("error",{error:error}))
+      .catch(error=>res.render("error",{error:error,token:req.level}))
 })
 
 router.delete("/deleteAdmin/:id",verificaNivelAdministrador,function(req,res){
@@ -275,7 +275,7 @@ router.delete("/deleteAdmin/:id",verificaNivelAdministrador,function(req,res){
           fs.unlinkSync(__dirname+"/../files/"+firstHalf+"/"+secondHalf+"/"+ficheiro.path_recurso+ficheiro.nome_ficheiro)
           axios.delete("http://localhost:8001/api/recursos/"+req.params.id)
               .then(data=>res.redirect("/admin/recursos"))
-              .catch(error=>res.render("error",{error:error}))
+              .catch(error=>res.render("error",{error:error,token:req.level}))
       })
 })
 
@@ -299,10 +299,10 @@ router.delete("/delete/:id",verificaNivelProdutor,function(req,res){
                 fs.unlinkSync(__dirname+"/../files/"+firstHalf+"/"+secondHalf+"/"+ficheiro.path_recurso+ficheiro.nome_ficheiro)
                 res.redirect("/editar")
               })
-              .catch(error=>res.render("error",{error:error}))
+              .catch(error=>res.render("error",{error:error,token:req.level}))
         }
       })
-      .catch(error=>res.render("error",{error:error}))
+      .catch(error=>res.render("error",{error:error,token:req.level}))
 })
 
 router.get("/admin",verificaNivelAdministrador,function(req,res){
@@ -320,13 +320,39 @@ router.get("/admin/utilizadores",verificaNivelAdministrador,function(req,res){
 router.get("/admin/recursos",verificaNivelAdministrador,function(req,res){
   axios.get("http://localhost:8001/api/recursos")
        .then(data=>res.render("admin-recursos",{token:req.level,recursos:data.data}))
-       .catch(error=>res.render("error",{error:error}))
+       .catch(error=>res.render("error",{error:error,token:req.level}))
 })
 router.get("/admin/logs",verificaNivelAdministrador,function(req,res){
   res.render("admin-logs",{token:req.level})
 })
 router.get("/admin/estatisticas",verificaNivelAdministrador,function(req,res){
   res.render("admin-estatisticas",{token:req.level})
+})
+
+router.get("/admin/noticias",verificaNivelAdministrador,function(req,res){
+  axios.get("http://localhost:8001/api/noticias")
+       .then(data=>res.status(200).render("admin-noticias",{token:req.level,noticias:data.data}))
+       .catch(error=>{
+         console.log(error)
+         res.status(501).render("error",{error:error,token:req.level})
+       })
+})
+router.post("/admin/noticias",verificaNivelAdministrador,function(req,res){
+  console.log(req.body)
+  axios.post("http://localhost:8001/api/noticias",req.body)
+       .then(data=>res.status(200).jsonp({token:req.level,noticias:data.data}))
+       .catch(error=>{
+         console.log(error)
+         res.status(501).jsonp({error:error,token:req.level})
+       })
+})
+
+
+
+router.post("/comentario/:id",verificaNivelConsumidor,function(req,res){
+  axios.post("http://localhost:8001/api/recursos/comentario/"+req.params.id,req.body)
+      .then(data=>res.render("/recursos"))
+      .catch(error=>res.render("error",{error:error,token:req.level}))
 })
 
 router.get("/logout",function(req,res){

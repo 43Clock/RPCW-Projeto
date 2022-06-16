@@ -1,6 +1,7 @@
 extends layout
 
 block content
+    .w3-modal(id="display")
     div(class="w3-row-padding")
         div(class="w3-col m2 w3-border-right")
             div(class="w3-bar-block")
@@ -16,5 +17,8 @@ block content
                 a(style="text-decoration: none" href="/admin/estatisticas")
                     button(id="stats" class="w3-bar-item w3-button") Estatisticas 
                         i(class="fas fa-chart-bar")
+                a(style="text-decoration: none" href="/admin/noticias")
+                    button(id="noticias" class="w3-bar-item w3-button") Noticias 
+                        i(class="fa fa-newspaper-o")
         div(id="display" class="w3-col m9")
             block content-admin

@@ -26,6 +26,12 @@ module.exports.inserir = (t) => {
     return novo.save()
 }
 
+module.exports.inserirComentario = (id,comentario) => {
+    return Ficheiro.findOneAndUpdate({_id: mongoose.Types.ObjectId(id)},
+                                     {$push:{comentarios:comentario}},
+                                     {new:true})
+}
+
 module.exports.remover = function(id){
     return Ficheiro.deleteOne({_id: mongoose.Types.ObjectId(id)})
 }

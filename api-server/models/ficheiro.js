@@ -13,7 +13,16 @@ var ficheiroSchema = new mongoose.Schema({
     nome_ficheiro: String,
     titulo_recurso: String,
     path_recurso: String,
-    tipo_recurso: String
+    tipo_recurso: String,
+    comentarios:[
+      {
+        "id_user": String,
+        "data_criacao": String,
+        "comentario": String
+      }
+    ],
+    likeBy: [{type: String}],
+    dislikedBy: [{type: String}]
   });
 
 module.exports = mongoose.model('ficheiros', ficheiroSchema)

@@ -1,0 +1,24 @@
+extends layout
+
+block content
+    div(class="w3-container w3-border w3-round-large w3-light-grey" style="width:40%;margin:5em auto")
+        h1.w3-center Registar
+        form.w3-container(action='/registar' method='POST')
+            if(erro)
+              p(class="w3-center w3-red")=erro
+            label Username
+            input.w3-input.w3-border.w3-round(type="text" name="username" required)
+            label Password
+            input.w3-input.w3-border.w3-round(type="password" name="password" required)
+            label Confirmar Password
+            input.w3-input.w3-border.w3-round(type="password" name="password_confirm" required)
+            div.w3-center
+            label Tipo de Utilizador
+            select(class="w3-select w3-border w3-round w3-white" name="level" required)
+              option(value="" style="display:none" disable selected ) Escolher tipo de Utilizador 
+              option(value="Consumidor") Consumidor
+              option(value="Produtor") Produtor
+              option(value="Administrador") Administrador 
+            div.w3-center
+                input.w3-btn.w3-dark-grey.w3-center.w3-margin(type="submit" value="Registar")
+    script.

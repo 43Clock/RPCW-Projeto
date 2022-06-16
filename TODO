@@ -1,4 +1,4 @@
-- Adicionar campo para pesquisa nas tabelas (com jquery) - falta adicionar para pequisar por tipo (checkboxes com os tipos possiveis?) e paginação?
+- Adicionar paginação as tabelas?
   
 - Adicionar criacao/edicao/remoção de noticias para o admin
 
@@ -8,4 +8,8 @@
 
 - Adicionar logs + chart.js
 
-- O hash é criado com a data de submissao? Os zips diferentes são inseridos, mas os ficheiros não são duplicados, por isso ao eliminar de 1 projeto, elimina-se de todos os projetos iguais
+- Alterar o onclick da table row para uma cena + espefica
+
+- Melhorar o modal dos projetos
+
+- Verificar caracteres ao registar conta

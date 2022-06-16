@@ -1,0 +1,7 @@
+extends layout
+
+block content
+  .w3-card-4
+      header.w3-container
+        h1 #{error.status} #{message}
+        pre #{error.stack}
