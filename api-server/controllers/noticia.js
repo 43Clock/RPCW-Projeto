@@ -9,16 +9,49 @@ module.exports.listar = () => {
 }
 
 module.exports.inserir = (t) => {
-    var novo = new Ficheiro(t)
+    var novo = new Noticia(t)
     return novo.save()
 }
 
-/*
+module.exports.remover = function(id){
+    return Noticia.deleteOne({_id: mongoose.Types.ObjectId(id)})
+
+}
+
 module.exports.consultar = (id) => {
-    return Ficheiro
+    return Noticia
         .findOne({_id: mongoose.Types.ObjectId(id)})
         .exec()
 }
+
+module.exports.alterar = function(id,vals){
+    return Noticia
+        .findOneAndUpdate(
+            {_id: mongoose.Types.ObjectId(id)},
+            {
+                titulo:vals.titulo,
+                conteudo:vals.conteudo,
+                visibilidade:vals.visibilidade
+            },
+            {new:true})
+}
+
+module.exports.alterarVisibilidade = function(id,vals){
+    return Noticia
+        .findOneAndUpdate(
+            {_id: mongoose.Types.ObjectId(id)},
+            {
+                visibilidade:vals.visibilidade
+            },
+            {new:true})
+}
+/*
+
+    data_criacao: String,
+    titulo: String,
+    conteudo: String,
+    visibilidade: String
+
 
 module.exports.consultarUser = (id) => {
     return Ficheiro
@@ -29,10 +62,6 @@ module.exports.consultarUser = (id) => {
 
 
 
-module.exports.remover = function(id){
-    return Ficheiro.deleteOne({_id: mongoose.Types.ObjectId(id)})
-}
-module.exports.alterar = function(id,tipo){
-    return Ficheiro.findOneAndUpdate({_id: mongoose.Types.ObjectId(id)}, {tipo_recurso:tipo},{new:true})
-}
+
+
 */

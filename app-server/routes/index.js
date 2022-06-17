@@ -38,24 +38,24 @@ function verificaNivelAdministrador(req,res,next){
 }
 
 router.get("/",function(req,res){
-  res.render("index",{token:req.level})
+  res.status(200).render("index",{token:req.level})
 })
 
 
 router.get("/recursos",verificaNivelConsumidor, function (req, res) {
   axios.get("http://localhost:8001/api/recursos")
       .then(dados=>{
-        res.render("recursos",{ficheiros:dados.data,token:req.level,user:req.username});  
+        res.status(200).render("recursos",{ficheiros:dados.data,token:req.level,user:req.username});  
       })
       .catch(error=>{
-        res.render("error",{error:error,token:req.level})
+        res.status(501).render("error",{error:error,token:req.level})
       })
 });
 
 router.get("/projetos",verificaNivelConsumidor,function(req,res){
   axios.get("http://localhost:8001/api/projetos")
-      .then(data=>res.render("projetos",{projetos:data.data.projetos,ficheiros:data.data.ficheiros,token:req.level}))
-      .catch(error=>{res.render("error",{error:error,token:req.level})})
+      .then(data=>res.status(200).render("projetos",{projetos:data.data.projetos,ficheiros:data.data.ficheiros,token:req.level}))
+      .catch(error=>{res.status(501).render("error",{error:error,token:req.level})})
 })
 
 router.get("/projetos/:id",verificaNivelConsumidor,function(req,res){
@@ -76,7 +76,7 @@ router.get("/projetos/:id",verificaNivelConsumidor,function(req,res){
 })
 
 router.get("/upload", verificaNivelProdutor,function(req,res){
-  res.render("upload",{token:req.level,erro:req.query.erro,sucesso:req.query.sucesso})
+  res.status(200).render("upload",{token:req.level,erro:req.query.erro,sucesso:req.query.sucesso})
 })
 
 router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req, res) {
@@ -160,7 +160,7 @@ router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req,
                       console.log(resposta.data)
                     })
                     .catch(error=>{
-                      res.render("erro",{error:error,token:req.level})
+                      res.status(201).render("erro",{error:error,token:req.level})
                     })
               }
             });
@@ -199,12 +199,12 @@ router.get("/download/:id", verificaNivelConsumidor, function(req,res){
           res.status(200)
       })
       .catch(error=>{
-        res.render("error",{error:error,token:req.level})
+        res.status(501).render("error",{error:error,token:req.level})
       })
 })
 
 router.get("/login",function(req,res){
-    res.render("login",{token:req.level,erro:req.query.erro})
+    res.status(200).render("login",{token:req.level,erro:req.query.erro})
 })
 
 router.post("/login",function(req,res){
@@ -224,14 +224,14 @@ router.post("/login",function(req,res){
       if(error.response.status == 409 || error.response.status == 401){
         res.status(error.response.status).redirect("/login?erro="+error.response.data.erro)
       }else{
-        res.render("error",{error:error,token:req.level})
+        res.status(501).render("error",{error:error,token:req.level})
       }
     })
 });
 
 
 router.get("/registar",function(req,res){
-  res.render("registar",{erro:req.query.erro,token:req.level})
+  res.status(200).render("registar",{erro:req.query.erro,token:req.level})
 })
 
 router.post("/registar",function(req,res){
@@ -249,7 +249,7 @@ router.post("/registar",function(req,res){
         if(error.response.status == 409){
           res.status(409).redirect("/registar?erro="+error.response.data.erro)
         }else{
-          res.render("error",{error:error,token:req.level})
+          res.status(501).render("error",{error:error,token:req.level})
         }
       })
 })
@@ -257,9 +257,9 @@ router.post("/registar",function(req,res){
 router.get("/editar",verificaNivelProdutor,function(req,res){
   axios.get("http://localhost:8001/api/recursos/user/"+req.username)
       .then(data=>{
-        res.render("editar",{ficheiros:data.data,token:req.level})
+        res.status(200).render("editar",{ficheiros:data.data,token:req.level})
       })
-      .catch(error=>res.render("error",{error:error,token:req.level}))
+      .catch(error=>res.status(501).render("error",{error:error,token:req.level}))
 })
 
 router.delete("/deleteAdmin/:id",verificaNivelAdministrador,function(req,res){
@@ -275,7 +275,7 @@ router.delete("/deleteAdmin/:id",verificaNivelAdministrador,function(req,res){
           fs.unlinkSync(__dirname+"/../files/"+firstHalf+"/"+secondHalf+"/"+ficheiro.path_recurso+ficheiro.nome_ficheiro)
           axios.delete("http://localhost:8001/api/recursos/"+req.params.id)
               .then(data=>res.redirect("/admin/recursos"))
-              .catch(error=>res.render("error",{error:error,token:req.level}))
+              .catch(error=>res.status(501).render("error",{error:error,token:req.level}))
       })
 })
 
@@ -299,14 +299,14 @@ router.delete("/delete/:id",verificaNivelProdutor,function(req,res){
                 fs.unlinkSync(__dirname+"/../files/"+firstHalf+"/"+secondHalf+"/"+ficheiro.path_recurso+ficheiro.nome_ficheiro)
                 res.redirect("/editar")
               })
-              .catch(error=>res.render("error",{error:error,token:req.level}))
+              .catch(error=>res.status(501).render("error",{error:error,token:req.level}))
         }
       })
-      .catch(error=>res.render("error",{error:error,token:req.level}))
+      .catch(error=>res.status(501).render("error",{error:error,token:req.level}))
 })
 
 router.get("/admin",verificaNivelAdministrador,function(req,res){
-  res.render("admin-original")
+  res.status(200).render("admin-original")
 })
 
 router.get("/admin/utilizadores",verificaNivelAdministrador,function(req,res){
@@ -315,19 +315,24 @@ router.get("/admin/utilizadores",verificaNivelAdministrador,function(req,res){
       //console.log(data.data)
       res.status(200).render("admin-utilizadores",{utilizadores:data.data,token:req.level})
     })
-    .catch(error=>res.render("error",{error:error}))
+    .catch(error=>res.status(501).render("error",{error:error}))
 })
 router.get("/admin/recursos",verificaNivelAdministrador,function(req,res){
   axios.get("http://localhost:8001/api/recursos")
-       .then(data=>res.render("admin-recursos",{token:req.level,recursos:data.data}))
-       .catch(error=>res.render("error",{error:error,token:req.level}))
+       .then(data=>res.status(200).render("admin-recursos",{token:req.level,recursos:data.data}))
+       .catch(error=>res.status(501).render("error",{error:error,token:req.level}))
 })
 router.get("/admin/logs",verificaNivelAdministrador,function(req,res){
-  res.render("admin-logs",{token:req.level})
+  res.status(200).render("admin-logs",{token:req.level})
 })
 router.get("/admin/estatisticas",verificaNivelAdministrador,function(req,res){
-  res.render("admin-estatisticas",{token:req.level})
+  res.status(200).render("admin-estatisticas",{token:req.level})
 })
+
+
+
+
+
 
 router.get("/admin/noticias",verificaNivelAdministrador,function(req,res){
   axios.get("http://localhost:8001/api/noticias")
@@ -346,13 +351,48 @@ router.post("/admin/noticias",verificaNivelAdministrador,function(req,res){
          res.status(501).jsonp({error:error,token:req.level})
        })
 })
+router.delete("/admin/noticias/:id",verificaNivelAdministrador,function(req,res){
+  console.log(req.params.id)
+  axios.delete("http://localhost:8001/api/noticias/"+req.params.id)
+    .then(data=>{
+      res.status(200).jsonp({token:req.level,deleted:data.data})
+    })
+    .catch(error=>{
+      console.log(error)
+      res.status(501).jsonp({error:error,token:req.level})
+    })
+})
+router.get("/admin/noticias/:id",verificaNivelAdministrador,function(req,res){
+  console.log(req.params.id)
+  axios.get("http://localhost:8001/api/noticias/"+req.params.id)
+    .then(data=>{
+      res.status(200).jsonp({token:req.level,noticia:data.data})
+    })
+    .catch(error=>{
+      console.log(error)
+      res.status(501).jsonp({error:error,token:req.level})
+    })
+})
+router.put("/admin/noticias/:id",verificaNivelAdministrador,function(req,res){
+  console.log(req.params.id)
+  axios.put("http://localhost:8001/api/noticias/"+req.params.id,req.body)
+    .then(data=>{
+      res.status(200).jsonp({token:req.level,noticia:data.data})
+    })
+    .catch(error=>{
+      console.log(error)
+      res.status(501).jsonp({error:error,token:req.level})
+    })
+})
+
+
 
 
 
 router.post("/comentario/:id",verificaNivelConsumidor,function(req,res){
   axios.post("http://localhost:8001/api/recursos/comentario/"+req.params.id,req.body)
-      .then(data=>res.render("/recursos"))
-      .catch(error=>res.render("error",{error:error,token:req.level}))
+      .then(data=>res.status(200).render("/recursos"))
+      .catch(error=>res.status(501).render("error",{error:error,token:req.level}))
 })
 
 router.get("/logout",function(req,res){

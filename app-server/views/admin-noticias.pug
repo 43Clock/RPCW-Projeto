@@ -25,15 +25,22 @@ block content-admin
         tbody(id="tableBody")
             each noticia in noticias
                 tr(id="row-"+noticia._id)
-                    td(id="titulo-"+noticia._id)=noticia.username
-                    td(id="level-"+noticia._id)=noticia.level
+                    td(id="data-"+noticia._id)=noticia.data_criacao
+                    td(id="titulo-"+noticia._id)=noticia.titulo
+                    td(id="vis-"+noticia._id)
+                        //Por botoes diferentes - botão com ajax para alterar a visibilidade
+                        if noticia.visibilidade=="visivel" 
+                            button(id="visibilidade-"+noticia._id+"-visivel" class="w3-button w3-round-large w3-small") 
+                                i(class="fa fa-eye" aria-hidden="true")
+                        else
+                            button(id="visibilidade-"+noticia._id+"-invisivel" class="w3-button w3-round-large w3-small") 
+                                i(class="fa fa-eye-slash" aria-hidden="true")
                     td
                         button(id="edit-"+noticia._id class="w3-button w3-round-large w3-tiny w3-blue")
                             i(class="fa fa-pen")
                     td
                         button(id="remove-"+noticia._id class="w3-button w3-round-large w3-tiny w3-red") Remover
 
-    script(type ="text/javascript" src="/javascripts/noticias.js") 
     script(type="application/javascript" src= "https://cdn.tiny.cloud/1/no-api-key/tinymce/6.0.3-5/tinymce.min.js")
     script(type="application/javascript" src= "/javascripts/my-tinymce-config.js")
  
@@ -95,80 +102,114 @@ block content-admin
             lastColumn = n;
         }
 
-        
+        //abrir o modal...
         $(document).on('click','button[id^=edit]',function(){
             var id = $(this).attr("id").split("-")[1]
-            if(lastId){
-                $("#row-"+lastId).children("td:eq(-1)").remove()
-                $("#row-"+lastId).children("td:eq(-1)").remove()
-                $("#row-"+lastId).append('<td><button id="edit-'+lastId +'" class="w3-button w3-round-large w3-tiny w3-blue"><i class="fa fa-pen"></i></button></td>')
-                $("#row-"+lastId).append('<td><button id="remove-'+lastId+'" class="w3-button w3-round-large w3-tiny w3-red">Remover</button></td>')
-                $("#level-"+lastId).html(lastLevel)
-                $("#username-"+lastId).html(lastUsername)
-            }
-            $("#row-"+id).children("td:eq(-1)").remove()
-            $("#row-"+id).children("td:eq(-1)").remove()
-            $("#row-"+id).append('<td><button id="accept-'+id+'" class="w3-button w3-round-large w3-tiny w3-green"><i class="fa fa-check"></i></button></td>')
-            $("#row-"+id).append('<td><button id="cancel-'+id+'" class="w3-button w3-round-large w3-tiny w3-red"><i class="fa fa-times"></i></button></td>')
-            var level = $("#level-"+id).text()
-            var username = $("#username-"+id).text()
-            lastLevel = level
-            lastUsername = username
-            $("#level-"+id).html('<select id="select-'+id+'" class="w3-select" name="tipo"><option value="Consumidor">Consumidor</option><option value="Produtor">Produtor</option><option value="Administrador">Administrador</option></select>')
-            $("#username-"+id).html('<p><input id="input-'+id+'" class="w3-input" type="text" value="'+username+'"></p>')
-            lastId = id
+            lastId = undefined
+            
+            var data = {}
+            $.ajax({
+                url:"http://localhost:8003/admin/noticias/"+id,
+                type: 'GET',
+                success: function(result){
+                    //alert(JSON.stringify(result))
+                    alterarnoticia(result.noticia)
+                },
+                error: function(){
+                    alert("erro a pesquisar informacao")
+                    location.reload()
+                }
+            })
+
         })
 
-        $(document).on('click','button[id^=cancel]',function(){
+        
+
+        $(document).on('click','button[id^=visibilidade]',function(){
             var id = $(this).attr("id").split("-")[1]
-            console.log($(this))
-            $("#row-"+id).children("td:eq(-1)").remove()
-            $("#row-"+id).children("td:eq(-1)").remove()
-            $("#row-"+id).append('<td><button id="edit-'+id+'" class="w3-button w3-round-large w3-tiny w3-blue"><i class="fa fa-pen"></i></button></td>')
-            $("#row-"+id).append('<td><button id="remove-'+id+'" class="w3-button w3-round-large w3-tiny w3-red">Remover</button></td>')
-            $("#level-"+id).html(lastLevel)
-            $("#username-"+id).html(lastUsername)
+            var val = $(this).attr("id").split("-")[2]
+            if(val=="visivel")
+                val="invisivel"
+            else
+                val="visivel"
             lastId = undefined
+
+            var data = {}
+            data["visibilidade"] = val
+            $.ajax({
+                type: "PUT",
+                url: "/admin/noticias/"+id,
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(){
+                    alert("só alterar")
+                    location.reload()
+                },
+                error: function(){
+                    alert("erro")
+                    location.reload()
+                }
+            })   
         })
 
-        $(document).on('click','button[id^=accept]',function(){
-            var id = $(this).attr("id").split("-")[1]
-            $("#row-"+id).children("td:eq(-1)").remove()
-            $("#row-"+id).children("td:eq(-1)").remove()
-            $("#row-"+id).append('<td><button id="edit-'+id+'" class="w3-button w3-round-large w3-tiny w3-blue"><i class="fa fa-pen"></i></button></td>')
-            var level = $("#select-"+id+" option:selected").val()
-            var username = $("#input-"+id).val()
-            $("#level-"+id).text(level)
-            lastId = undefined
-            if(level != lastLevel || username != lastUsername ){
-                var data = {}
-                data["_id"] = id
-                if(username!= lastUsername) data["username"] = username
-                else data["username"] = lastUsername
-                if(level != lastLevel) data["level"] = level
-                else data["level"] = lastLevel
-                $.ajax({
-                    url:"http://localhost:8002/users",
-                    type: 'PUT',
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function(){
-                        location.reload()
-                    },
-                    error: function(){
-                        location.reload()
-                    }
-                })
-            }
-        })
 
         $(document).on('click','button[id^=remove]',function(){
             var id = $(this).attr("id").split("-")[1]
             lastId = undefined
             var data = {}
             $.ajax({
-                url:"http://localhost:8003/delete/"+id,
+                url:"http://localhost:8003/admin/noticias/"+id,
                 type: 'DELETE',
+                success: function(){
+                    alert("só htmlelement.remove")
+                    location.reload()
+                },
+                error: function(){
+                    alert("erro")
+                    location.reload()
+                }
+            })     
+        })
+
+
+
+        function criarnoticia(){
+            form = `
+            <fieldset>
+                <legend>Nova notícia</legend>
+                <label for="input">Introduza o Titulo:</label>
+                <input type="text" name="titulo" id="titulo">
+                
+                <textarea id="conteudo" style="width:100%;" placeholder="Conteudo"></textarea>
+                
+                <input class="w3-radio" type="radio" name="visibilidade" value="visivel" checked>
+                <label>Visível</label>
+
+                <input class="w3-radio" type="radio" name="visibilidade" value="invisivel">
+                <label>Invisível</label>
+                <button name="submeter" id="submeter">Submeter Notícia</button>
+            </fieldset>
+            `
+
+            
+            $("#display").empty()
+            $("#display").append(form)
+            $("#display").modal()
+        }
+        
+
+        $(document).on("click","button[id^=submeter]",function(){
+            var data = {}
+            data["titulo"] = $("input[id^=titulo]").val()
+            data["conteudo"] = $("textarea[id^=conteudo]").val()
+            data["visibilidade"] = $('input[name="visibilidade"]:checked').val();
+            var split = new Date().toISOString().substring(0,16).split("T")
+            data["data_criacao"] = split[0]+" "+split[1]
+            $.ajax({
+                type: "POST",
+                url: "/admin/noticias",
+                contentType: 'application/json',
+                data: JSON.stringify(data),
                 success: function(){
                     location.reload()
                 },
@@ -176,5 +217,53 @@ block content-admin
                     location.reload()
                 }
             })
+        })
+
+
+
+        function alterarnoticia(noticia){
+            form = `
+            <fieldset>
+                <legend>Alterar notícia - ${noticia.titulo}</legend>
+                <input type="hidden" id="idnoticia" value="${noticia._id}">
+                <label for="input">Introduza o Titulo:</label>
+                <input type="text" name="titulo" id="titulo" value="${noticia.titulo}">
+                
+                <textarea id="conteudo" style="width:100%;">${noticia.conteudo}</textarea>
+                
+                <input class="w3-radio" type="radio" name="visibilidade" value="visivel" ${(() => {if(noticia.visibilidade == "visivel") {return `checked`;}})()}>
+                <label>Visível</label>
+
+                <input class="w3-radio" type="radio" name="visibilidade" value="invisivel" ${(() => {if(noticia.visibilidade == "invisivel") {return `checked`;}})()}>
+                <label>Invisível</label>
+                <button name="alterar" id="alterar">Alterar Notícia</button>
+            </fieldset>
+            `
             
+            $("#display").empty()
+            $("#display").append(form)
+            $("#display").modal()
+        }
+
+
+        $(document).on("click","button[id^=alterar]",function(){
+            var data = {}
+            data["_id"]=$("input[id^=idnoticia]").val()
+            data["titulo"] = $("input[id^=titulo]").val()
+            data["conteudo"] = $("textarea[id^=conteudo]").val()
+            data["visibilidade"] = $('input[name="visibilidade"]:checked').val();
+            $.ajax({
+                type: "PUT",
+                url: "/admin/noticias/"+data["_id"],
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(){
+                    alert("só alterar")
+                    location.reload()
+                },
+                error: function(){
+                    alert("erro")
+                    location.reload()
+                }
+            })
         })

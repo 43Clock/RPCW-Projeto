@@ -87,11 +87,31 @@ router.get("/noticias",function(req,res){
 })
 
 router.post("/noticias",function(req,res){
-  console.log(req.body)
-  
-  Noticias.inserir(req.body)
+   Noticias.inserir(req.body)
         .then(dados=> res.status(200).jsonp(dados))
         .catch(erro=> res.status(507).jsonp(erro))
+})
+
+router.delete("/noticias/:id",function(req,res){  
+  Noticias.remover(req.params.id)
+        .then(dados=> res.status(200).jsonp(dados))
+        .catch(erro=> res.status(507).jsonp(erro))
+})
+router.get("/noticias/:id",function(req,res){  
+  Noticias.consultar(req.params.id)
+        .then(dados=> res.status(200).jsonp(dados))
+        .catch(erro=> res.status(507).jsonp(erro))
+})
+router.put("/noticias/:id",function(req,res){  
+  console.log(Object.keys(req.body).length)
+  if(Object.keys(req.body).length > 1)
+    Noticias.alterar(req.params.id,req.body)
+          .then(dados=> res.status(200).jsonp(dados))
+          .catch(erro=> res.status(507).jsonp(erro))
+  else
+    Noticias.alterarVisibilidade(req.params.id,req.body)
+      .then(dados=> res.status(200).jsonp(dados))
+      .catch(erro=> res.status(507).jsonp(erro))
 })
 
 module.exports = router;
