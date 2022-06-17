@@ -8,6 +8,12 @@ block content-admin
                 select(id="searchType" class="w3-select w3-border w3-round" name="tipo")
                     option(value="0" selected) Username
                     option(value="1") Level
+    div.visible(id="report")
+          if(erro)
+            p.w3-red.w3-center=erro
+          else
+            if(sucesso)
+              p.w3-green.w3-center=sucesso    
     table.w3-table-all(id="tabela")
         thead
             tr
@@ -138,14 +144,16 @@ block content-admin
                 if(level != lastLevel) data["level"] = level
                 else data["level"] = lastLevel
                 $.ajax({
-                    url:"http://localhost:8002/users",
+                    url:"http://localhost:8003/admin/utilizadores/"+id,
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(data),
-                    success: function(){
-                        location.reload()
+                    success: function(response){
+                        if(response.result == "redirect"){
+                            window.location.replace(response.url)
+                        }
                     },
-                    error: function(){
+                    error: function(response){
                         location.reload()
                     }
                 })
@@ -155,12 +163,13 @@ block content-admin
         $(document).on('click','button[id^=remove]',function(){
             var id = $(this).attr("id").split("-")[1]
             lastId = undefined
-            var data = {}
             $.ajax({
-                url:"http://localhost:8003/delete/"+id,
+                url:"http://localhost:8003/admin/utilizadores/"+id,
                 type: 'DELETE',
-                success: function(){
-                    location.reload()
+                success: function(response){
+                    if(response.result == "redirect"){
+                        window.location.replace(response.url)
+                    }
                 },
                 error: function(){
                     location.reload()
@@ -168,3 +177,9 @@ block content-admin
             })
             
         })
+
+        window.setTimeout("closereport();", 2500);
+
+        function closereport(){
+          document.getElementById("report").classList.add("hidden");
+        }

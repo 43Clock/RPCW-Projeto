@@ -2,6 +2,7 @@ var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var logger = require('morgan');
+var cookieParser = require('cookie-parser');
 var jwt = require('jsonwebtoken');
 var cors = require("cors")
 
@@ -23,15 +24,37 @@ db.once('open', function() {
 
 var app = express();
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
-
 app.use(cors()) 
 
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')));
+
+app.use(function(req,res,next){
+  var token = req.query.token
+  if(token!=undefined){
+    jwt.verify(token,"RPCWProjeto", (e,payload)=>{
+      if(e){
+        if(!(e instanceof jwt.TokenExpiredError)){
+          console.log(":(")
+          res.status(403).jsonp({error:"Não tem permissão para aceder"})
+        }
+        else
+          next()
+      }else{
+        req.level = payload.level
+        req.username = payload.username
+        next()
+      }
+    })
+  }
+  else{
+    res.status(403).jsonp({error:"Não tem permissão para aceder"})
+  }
+})
+
 
 app.use('/api', apiRouter);
 

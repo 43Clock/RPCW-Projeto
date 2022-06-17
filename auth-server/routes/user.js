@@ -15,8 +15,22 @@ router.get("/",function(req,res){
   
 router.put("/",function(req,res){
   console.log(req.body)
-  //TODO: verificar se não existe o novo nome na bd
-  User.alterar(req.body)
+  User.consultar(req.body.username)
+      .then(data=>{
+          if(data == null){
+            User.alterar(req.body)
+              .then(data=>res.status(200).jsonp(data))
+              .catch(error=>res.status(504).jsonp({error:error}))
+          }else{
+            res.status(409).jsonp({erro:"Username já existe"})
+          }
+      })
+      .catch(error=>res.status(502).jsonp({error:error}))
+})
+
+router.delete("/",function(req,res){
+  console.log(req.body.id_user)
+  User.remover(req.body.id_user)
       .then(data=>res.status(200).jsonp(data))
       .catch(error=>res.status(504).jsonp({error:error}))
 })

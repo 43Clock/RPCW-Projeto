@@ -9,12 +9,20 @@ block content-admin
                 select(id="searchType" class="w3-select w3-border w3-round" name="tipo")
                     option(value="1" selected) Ficheiro
                     option(value="2") Titulo Recurso
+        div.visible(id="report")
+          if(erro)
+            p.w3-red.w3-center=erro
+          else
+            if(sucesso)
+              p.w3-green.w3-center=sucesso
         table.w3-table-all(id="tabela")
             tr
                 th(id="0" onclick="sortTable(0)") Data
                 th(id="1" onclick="sortTable(1)") Ficheiro
                 th(id="2" onclick="sortTable(2)") Titulo Recurso
                 th(id="3" onclick="sortTable(3)") Tipo
+                th(id="4" onclick="sortTable(3)") Likes
+                th(id="5" onclick="sortTable(3)") Dislikes
             tbody(id="tableBody")
                 each f in recursos
                     tr(id="row-"+f._id)
@@ -22,6 +30,8 @@ block content-admin
                         td=f.nome_ficheiro
                         td=f.titulo_recurso
                         td(id="tipo-"+f._id)=f.tipo_recurso
+                        td=f.likedBy.length
+                        td=f.dislikedBy.length
                         td
                             button(id="edit-"+f._id class="w3-button w3-round-large w3-tiny w3-blue")
                                 i(class="fa fa-pen")
@@ -131,15 +141,14 @@ block content-admin
                     var data = {}
                     data["tipo_recurso"] = valor
                     $.ajax({
-                        url:"http://localhost:8001/api/recursos/"+id,
+                        url:"/admin/recursos/"+id,
                         type: 'PUT',
                         contentType: 'application/json',
                         data: JSON.stringify(data),
-                        success: function(){
-                            location.reload()
-                        },
-                        error: function(){
-                            location.reload()
+                        success: function(response){
+                            if(response.result == "redirect"){
+                                window.location.replace(response.url)
+                            }
                         }
                     })
                 }
@@ -150,10 +159,12 @@ block content-admin
                 lastId = undefined
                 var data = {}
                 $.ajax({
-                    url:"http://localhost:8003/deleteAdmin/"+id,
+                    url:"http://localhost:8003/admin/recursos/"+id,
                     type: 'DELETE',
-                    success: function(){
-                        location.reload()
+                    success: function(response){
+                        if(response.result == "redirect"){
+                            window.location.replace(response.url)
+                        }
                     },
                     error: function(){
                         location.reload()
@@ -161,3 +172,9 @@ block content-admin
                 })
                 
             })
+
+            window.setTimeout("closereport();", 2500);
+
+            function closereport(){
+            document.getElementById("report").classList.add("hidden");
+            }

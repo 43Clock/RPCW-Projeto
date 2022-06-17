@@ -9,6 +9,8 @@ const bcrypt = require("bcrypt");
 const path = require('path');
 const {spawn} = require('child_process');
 
+
+
 var upload = multer({ dest: "uploads/" });
 
 
@@ -43,7 +45,7 @@ router.get("/",function(req,res){
 
 
 router.get("/recursos",verificaNivelConsumidor, function (req, res) {
-  axios.get("http://localhost:8001/api/recursos")
+  axios.get("http://localhost:8001/api/recursos?token="+req.cookies.token)
       .then(dados=>{
         res.status(200).render("recursos",{ficheiros:dados.data,token:req.level,user:req.username});  
       })
@@ -53,14 +55,13 @@ router.get("/recursos",verificaNivelConsumidor, function (req, res) {
 });
 
 router.get("/projetos",verificaNivelConsumidor,function(req,res){
-  axios.get("http://localhost:8001/api/projetos")
+  axios.get("http://localhost:8001/api/projetos?token="+req.cookies.token)
       .then(data=>res.status(200).render("projetos",{projetos:data.data.projetos,ficheiros:data.data.ficheiros,token:req.level}))
       .catch(error=>{res.status(501).render("error",{error:error,token:req.level})})
 })
 
 router.get("/projetos/:id",verificaNivelConsumidor,function(req,res){
     var hash = CryptoJs.MD5(req.params.id).toString();
-    console.log(hash)
     var firstHalf = hash.slice(0, 16);
     var secondHalf = hash.slice(16, 32);
     var caminho = __dirname + "/../files/" + firstHalf + "/" + secondHalf+"/data"
@@ -69,9 +70,13 @@ router.get("/projetos/:id",verificaNivelConsumidor,function(req,res){
       python.emit("done")
     })
     python.on("done",()=>{
-      console.log(fs.existsSync(__dirname+"/../"+hash+".zip"))
-      res.download(__dirname+"/../"+hash+".zip")
-      res.status(200)
+      res.download(__dirname+"/../"+hash+".zip",function(err){
+        if(err) res.status(501).render("error",{error:error,token:req.level})
+        else{
+          fs.unlinkSync(__dirname+"/../"+hash+".zip")
+          res.status(200)
+        }
+      })
     })
 })
 
@@ -155,10 +160,8 @@ router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req,
                   path_recurso: path,
                   tipo_recurso: metadados.tipo
                 }
-                axios.post("http://localhost:8001/api/recursos",body)
-                    .then(resposta=>{
-                      console.log(resposta.data)
-                    })
+                axios.post("http://localhost:8001/api/recursos?token="+req.cookies.token,body)
+                    .then(resposta=>{})
                     .catch(error=>{
                       res.status(201).render("erro",{error:error,token:req.level})
                     })
@@ -184,7 +187,7 @@ router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req,
 
 router.get("/download/:id", verificaNivelConsumidor, function(req,res){
   var id = req.params.id
-  axios.get("http://localhost:8001/api/recursos/"+id)
+  axios.get("http://localhost:8001/api/recursos/"+id+"?token="+req.cookies.token)
       .then(data=>{
           var ficheiro = data.data
           var zipName = ficheiro.zip_name;
@@ -193,8 +196,6 @@ router.get("/download/:id", verificaNivelConsumidor, function(req,res){
           .toString();
           var firstHalf = hash.slice(0, 16);
           var secondHalf = hash.slice(16, 32);
-          console.log(ficheiro)
-          console.log(__dirname+"/../files/"+firstHalf+"/"+secondHalf+"/"+ficheiro.path_recurso+ficheiro.nome_ficheiro)
           res.download(__dirname+"/../files/"+firstHalf+"/"+secondHalf+"/"+ficheiro.path_recurso+ficheiro.nome_ficheiro)
           res.status(200)
       })
@@ -209,7 +210,6 @@ router.get("/login",function(req,res){
 
 router.post("/login",function(req,res){
   req.body.username = req.body.username.toLowerCase()
-  console.log(req.body)
   axios.post('http://localhost:8002/users/login', req.body)
     .then(dados => {
       res.cookie('token', dados.data.token, {
@@ -220,7 +220,6 @@ router.post("/login",function(req,res){
       res.redirect('/')
     })
     .catch(error => {
-      console.log(error)
       if(error.response.status == 409 || error.response.status == 401){
         res.status(error.response.status).redirect("/login?erro="+error.response.data.erro)
       }else{
@@ -234,15 +233,25 @@ router.get("/registar",function(req,res){
   res.status(200).render("registar",{erro:req.query.erro,token:req.level})
 })
 
+function onlyLettersAndNumbers(str) {
+  return /^[A-Za-z0-9]*$/.test(str);
+}
+
 router.post("/registar",function(req,res){
-  if(req.body.password != req.body.password_confirm) res.redirect("/registar?erro=Passwords não são iguais")
+  if(!onlyLettersAndNumbers(req.body.username)){
+    res.redirect("/registar?erro=Nome de utilizador so pode ter letras e/ou numeros")
+    return;
+  } 
+  if(req.body.password != req.body.password_confirm) {
+    res.redirect("/registar?erro=Passwords não são iguais")
+    return;
+  }
   var form_data = req.body
   const salt = bcrypt.genSaltSync(10)
   form_data.password = bcrypt.hashSync(req.body.password,salt) 
   form_data.username = req.body.username.toLowerCase()
   axios.post("http://localhost:8002/users/registar",form_data)
       .then(data => {
-        console.log(data)
         res.redirect("/")
       })
       .catch(error=>{
@@ -254,40 +263,30 @@ router.post("/registar",function(req,res){
       })
 })
 
+//Rotas para editar ficheiros
 router.get("/editar",verificaNivelProdutor,function(req,res){
-  axios.get("http://localhost:8001/api/recursos/user/"+req.username)
+  axios.get("http://localhost:8001/api/recursos/user/"+req.username+"?token="+req.cookies.token)
       .then(data=>{
-        res.status(200).render("editar",{ficheiros:data.data,token:req.level})
+        res.status(200).render("editar",{ficheiros:data.data,token:req.level,sucesso:req.query.sucesso})
       })
       .catch(error=>res.status(501).render("error",{error:error,token:req.level}))
 })
 
-router.delete("/deleteAdmin/:id",verificaNivelAdministrador,function(req,res){
-  axios.get("http://localhost:8001/api/recursos/"+req.params.id)
-      .then(data=>{
-          var ficheiro = data.data
-          var zipName = ficheiro.zip_name;
-          var hash = CryptoJs.MD5(
-            zipName + ficheiro.data_submissao.toString())
-          .toString();
-          var firstHalf = hash.slice(0, 16);
-          var secondHalf = hash.slice(16, 32);
-          fs.unlinkSync(__dirname+"/../files/"+firstHalf+"/"+secondHalf+"/"+ficheiro.path_recurso+ficheiro.nome_ficheiro)
-          axios.delete("http://localhost:8001/api/recursos/"+req.params.id)
-              .then(data=>res.redirect("/admin/recursos"))
-              .catch(error=>res.status(501).render("error",{error:error,token:req.level}))
-      })
+router.put("/editar/:id",verificaNivelProdutor,function(req,res){
+  axios.put("http://localhost:8001/api/recursos/"+req.params.id+"?token="+req.cookies.token,req.body)
+      .then(data=>res.status(200).send({result: "redirect", url:"/editar?sucesso=Alteração feita com sucesso!"}))
+      .catch(error=>res.status(501).jsonp(error))
 })
 
-router.delete("/delete/:id",verificaNivelProdutor,function(req,res){
-  axios.get("http://localhost:8001/api/recursos/user/"+req.username)
+router.delete("/editar/:id",verificaNivelProdutor,function(req,res){
+  axios.get("http://localhost:8001/api/recursos/user/"+req.username+"?token="+req.cookies.token)
       .then(data=>{
         var ids = data.data.map(ele=>ele._id)
         if(!(req.level == "Administrador" || ids.includes(req.params.id))){
           res.redirect("/")
         } 
         else{
-          axios.delete("http://localhost:8001/api/recursos/"+req.params.id)
+          axios.delete("http://localhost:8001/api/recursos/"+req.params.id+"?token="+req.cookies.token)
               .then(complete=>{
                 var ficheiro = data.data.filter(ele=>ele._id == req.params.id)[0]
                 var zipName = ficheiro.zip_name;
@@ -309,22 +308,74 @@ router.get("/admin",verificaNivelAdministrador,function(req,res){
   res.status(200).render("admin-original")
 })
 
+
+//Rotas para tratar dos utilizadores (admin)
 router.get("/admin/utilizadores",verificaNivelAdministrador,function(req,res){
   axios.get("http://localhost:8002/users")
     .then(data=>{
-      //console.log(data.data)
-      res.status(200).render("admin-utilizadores",{utilizadores:data.data,token:req.level})
+      res.status(200).render("admin-utilizadores",{utilizadores:data.data,token:req.level,sucesso:req.query.sucesso,erro:req.query.erro})
     })
     .catch(error=>res.status(501).render("error",{error:error}))
 })
+
+router.put("/admin/utilizadores/:id",verificaNivelAdministrador,function(req,res){
+  axios.put("http://localhost:8002/users",req.body)
+      .then(data=>res.status(200).send({result: "redirect", url:"/admin/utilizadores?sucesso=Alteração feita com sucesso!"}))
+      .catch(error=>{
+        if(error.response.status == 409){
+          res.status(200).send({result: "redirect", url:"/admin/utilizadores?erro="+error.response.data.erro})
+        }else{
+          res.status(501).render("error",{error:error,token:req.level})
+        }
+      })
+})
+
+router.delete("/admin/utilizadores/:id",verificaNivelAdministrador,function(req,res){
+  axios.delete("http://localhost:8002/users",{data:{id_user:req.params.id}})
+      .then(data=>res.status(200).send({result: "redirect", url:"/admin/utilizadores?sucesso=Remoção feita com sucesso!"}))
+      .catch(error=>res.status(501).jsonp(error))
+})
+
+
+//Rotas para os recursos (admin)
 router.get("/admin/recursos",verificaNivelAdministrador,function(req,res){
   axios.get("http://localhost:8001/api/recursos")
-       .then(data=>res.status(200).render("admin-recursos",{token:req.level,recursos:data.data}))
+       .then(data=>res.status(200).render("admin-recursos",{token:req.level,recursos:data.data,sucesso:req.query.sucesso}))
        .catch(error=>res.status(501).render("error",{error:error,token:req.level}))
 })
+
+router.put("/admin/recursos/:id",verificaNivelAdministrador,function(req,res){
+  axios.put("http://localhost:8001/api/recursos/"+req.params.id+"?token="+req.cookies.token,req.body)
+      .then(data=>res.status(200).send({result: "redirect", url:"/admin/recursos?sucesso=Alteração feita com sucesso!"}))
+      .catch(error=>res.status(501).jsonp(error))
+})
+
+router.delete("/admin/recursos/:id",verificaNivelAdministrador,function(req,res){
+  console.log("YESSS")
+  axios.get("http://localhost:8001/api/recursos/"+req.params.id+"?token="+req.cookies.token)
+      .then(data=>{
+          var ficheiro = data.data
+          var zipName = ficheiro.zip_name;
+          var hash = CryptoJs.MD5(
+            zipName + ficheiro.data_submissao.toString())
+          .toString();
+          var firstHalf = hash.slice(0, 16);
+          var secondHalf = hash.slice(16, 32);
+          fs.unlinkSync(__dirname+"/../files/"+firstHalf+"/"+secondHalf+"/"+ficheiro.path_recurso+ficheiro.nome_ficheiro)
+          axios.delete("http://localhost:8001/api/recursos/"+req.params.id+"?token="+req.cookies.token)
+              .then(data=>res.status(200).send({result: "redirect", url:"/admin/recursos?sucesso=Ficheiro removido com sucesso!"}))
+              .catch(error=>res.status(501).render("error",{error:error,token:req.level}))
+      })
+})
+
+
+
+
 router.get("/admin/logs",verificaNivelAdministrador,function(req,res){
   res.status(200).render("admin-logs",{token:req.level})
 })
+
+
 router.get("/admin/estatisticas",verificaNivelAdministrador,function(req,res){
   res.status(200).render("admin-estatisticas",{token:req.level})
 })
@@ -333,18 +384,18 @@ router.get("/admin/estatisticas",verificaNivelAdministrador,function(req,res){
 
 
 
-
+//Rotas para tratar das noticias do admin
 router.get("/admin/noticias",verificaNivelAdministrador,function(req,res){
-  axios.get("http://localhost:8001/api/noticias")
+  axios.get("http://localhost:8001/api/noticias?token="+req.cookies.token)
        .then(data=>res.status(200).render("admin-noticias",{token:req.level,noticias:data.data}))
        .catch(error=>{
-         console.log(error)
+        //  console.log(error)
          res.status(501).render("error",{error:error,token:req.level})
        })
 })
 router.post("/admin/noticias",verificaNivelAdministrador,function(req,res){
   console.log(req.body)
-  axios.post("http://localhost:8001/api/noticias",req.body)
+  axios.post("http://localhost:8001/api/noticias?token="+req.cookies.token,req.body)
        .then(data=>res.status(200).jsonp({token:req.level,noticias:data.data}))
        .catch(error=>{
          console.log(error)
@@ -353,7 +404,7 @@ router.post("/admin/noticias",verificaNivelAdministrador,function(req,res){
 })
 router.delete("/admin/noticias/:id",verificaNivelAdministrador,function(req,res){
   console.log(req.params.id)
-  axios.delete("http://localhost:8001/api/noticias/"+req.params.id)
+  axios.delete("http://localhost:8001/api/noticias/"+req.params.id+"?token="+req.cookies.token)
     .then(data=>{
       res.status(200).jsonp({token:req.level,deleted:data.data})
     })
@@ -364,7 +415,7 @@ router.delete("/admin/noticias/:id",verificaNivelAdministrador,function(req,res)
 })
 router.get("/admin/noticias/:id",verificaNivelAdministrador,function(req,res){
   console.log(req.params.id)
-  axios.get("http://localhost:8001/api/noticias/"+req.params.id)
+  axios.get("http://localhost:8001/api/noticias/"+req.params.id+"?token="+req.cookies.token)
     .then(data=>{
       res.status(200).jsonp({token:req.level,noticia:data.data})
     })
@@ -375,7 +426,7 @@ router.get("/admin/noticias/:id",verificaNivelAdministrador,function(req,res){
 })
 router.put("/admin/noticias/:id",verificaNivelAdministrador,function(req,res){
   console.log(req.params.id)
-  axios.put("http://localhost:8001/api/noticias/"+req.params.id,req.body)
+  axios.put("http://localhost:8001/api/noticias/"+req.params.id+"?token="+req.cookies.token,req.body)
     .then(data=>{
       res.status(200).jsonp({token:req.level,noticia:data.data})
     })
@@ -389,11 +440,43 @@ router.put("/admin/noticias/:id",verificaNivelAdministrador,function(req,res){
 
 
 
+//Rota para tratar dos comentarios
 router.post("/comentario/:id",verificaNivelConsumidor,function(req,res){
-  axios.post("http://localhost:8001/api/recursos/comentario/"+req.params.id,req.body)
+  var form = req.body
+  form.id_user = req.username
+  console.log(form)
+  axios.post("http://localhost:8001/api/recursos/comentario/"+req.params.id+"?token="+req.cookies.token,form)
       .then(data=>res.status(200).render("/recursos"))
       .catch(error=>res.status(501).render("error",{error:error,token:req.level}))
 })
+
+//Rotas para tratar dos likes
+router.post("/like/:id",verificaNivelConsumidor,function(req,res){
+  axios.post("http://localhost:8001/api/recursos/like/"+req.params.id+"?token="+req.cookies.token,{id_user:req.username})
+      .then(data => res.status(200).jsonp(data.data))
+      .catch(err => res.status(510).jsonp({error:err}))
+})
+
+router.post("/dislike/:id",verificaNivelConsumidor,function(req,res){
+  axios.post("http://localhost:8001/api/recursos/dislike/"+req.params.id+"?token="+req.cookies.token,{id_user:req.username})
+      .then(data => res.status(200).jsonp(data.data))
+      .catch(err => res.status(511).jsonp({error:err}))
+})
+
+router.delete("/like/:id",verificaNivelConsumidor,function(req,res){
+  console.log(req.username)
+  axios.delete("http://localhost:8001/api/recursos/like/"+req.params.id+"?token="+req.cookies.token,{data:{id_user:req.username}})
+      .then(data => res.status(200).jsonp(data.data))
+      .catch(err => res.status(512).jsonp({error:err}))
+})
+
+router.delete("/dislike/:id",verificaNivelConsumidor,function(req,res){
+  axios.delete("http://localhost:8001/api/recursos/dislike/"+req.params.id+"?token="+req.cookies.token,{data:{id_user:req.username}})
+      .then(data => res.status(200).jsonp(data.data))
+      .catch(err => res.status(513).jsonp({error:err}))
+})
+
+
 
 router.get("/logout",function(req,res){
   res.cookie("token",undefined)

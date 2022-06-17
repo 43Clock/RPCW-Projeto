@@ -21,7 +21,7 @@ var ficheiroSchema = new mongoose.Schema({
         "comentario": String
       }
     ],
-    likeBy: [{type: String}],
+    likedBy: [{type: String}],
     dislikedBy: [{type: String}]
   });
 

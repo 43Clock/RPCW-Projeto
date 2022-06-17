@@ -31,7 +31,7 @@ block content
                         td=f.id_submissor
                         td=f.titulo_recurso
                         td
-                            a(href="/projetos/"+f.zip_name+f.data_submissao onclick="event.cancelBubble" class="w3-button w3-green w3-round w3-tiny")
+                            a(href="/projetos/"+f.zip_name+f.data_submissao onclick="event.stopPropagation()" class="w3-button w3-green w3-round w3-tiny")
                                 i(class="fas fa-download")
         else
           p Ainda não há ficheiros armazenados...

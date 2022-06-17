@@ -38,3 +38,30 @@ module.exports.remover = function(id){
 module.exports.alterar = function(id,tipo){
     return Ficheiro.findOneAndUpdate({_id: mongoose.Types.ObjectId(id)}, {tipo_recurso:tipo},{new:true})
 }
+
+module.exports.addLike = (id,user) =>{
+    return Ficheiro.findOneAndUpdate({_id: mongoose.Types.ObjectId(id)},
+                                     {$push:{likedBy:user}},
+                                     {new:true})
+}
+
+module.exports.addDislike = (id,user) =>{
+    return Ficheiro.findOneAndUpdate({_id: mongoose.Types.ObjectId(id)},
+                                     {$push:{dislikedBy:user}},
+                                     {new:true})
+}
+
+module.exports.removeLike = (id,user) =>{
+    console.log(user)
+    return Ficheiro.findOneAndUpdate({_id: mongoose.Types.ObjectId(id)},
+                                     {$pull:{likedBy:user}},
+                                     {new:true})
+}
+
+module.exports.removeDislike = (id,user) =>{
+    console.log(user)
+    return Ficheiro.findOneAndUpdate({_id: mongoose.Types.ObjectId(id)},
+                                     {$pull:{dislikedBy:user}},
+                                     {new:true})
+}
+

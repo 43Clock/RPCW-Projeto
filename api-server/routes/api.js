@@ -4,7 +4,32 @@ var router = express.Router();
 const Ficheiro = require('../controllers/ficheiro')
 const Noticias = require('../controllers/noticia')
 
-router.get("/projetos",function(req,res){
+function verificaNivelConsumidor(req,res,next){
+  autorizados = ["Consumidor","Produtor","Administrador"]
+  if(autorizados.includes(req.level))
+    next()
+  else
+    res.status(403).render("error-level",{token:req.level})
+}
+
+function verificaNivelProdutor(req,res,next){
+  autorizados = ["Produtor","Administrador"]
+
+  if(autorizados.includes(req.level))
+    next()
+  else
+    res.status(403).render("error-level",{token:req.level})
+}
+
+function verificaNivelAdministrador(req,res,next){
+  autorizados = ["Administrador"]
+  if(autorizados.includes(req.level))
+    next()
+  else
+    res.status(403).render("error-level",{token:req.level})
+}
+
+router.get("/projetos",verificaNivelConsumidor,function(req,res){
   Ficheiro.listar()
           .then(dados=>{
             var uploadsUnicos = [...new Map(dados.map(item=> [item["data_submissao"],item])).values()]
@@ -21,36 +46,56 @@ router.get("/projetos",function(req,res){
           })
 })
 
-router.get("/recursos",function(req,res){
+router.get("/recursos",verificaNivelConsumidor,function(req,res){
+  console.log(req.cookies)
   Ficheiro.listar()
         .then(dados=> res.status(200).jsonp(dados))
         .catch(erro=> res.status(500).jsonp(erro))
 })
 
-router.post("/recursos", function(req,res){
+router.post("/recursos",verificaNivelProdutor,function(req,res){
   console.log(req.body)
   Ficheiro.inserir(req.body)
         .then(data =>res.status(200).jsonp({ok:"ok"}))
         .catch(error=>res.status(501).jsonp({error:error}))
 })
 
-router.post("/recursos/comentario/:id",function(req,res){
+router.post("/recursos/comentario/:id",verificaNivelConsumidor,function(req,res){
     Ficheiro.inserirComentario(req.params.id,req.body)
         .then(data =>res.status(200).jsonp({ok:"ok"}))
         .catch(error=>res.status(502).jsonp({error:error}))
 
 })
 
-router.post("/recursos/like/:id",function(req,res){
+router.post("/recursos/like/:id",verificaNivelConsumidor,function(req,res){
+  Ficheiro.addLike(req.params.id,req.body.id_user)
+      .then(data =>res.status(200).jsonp(data))
+      .catch(error=>res.status(502).jsonp(error))
+})
+
+router.post("/recursos/dislike/:id",verificaNivelConsumidor,function(req,res){
+  Ficheiro.addDislike(req.params.id,req.body.id_user)
+      .then(data =>res.status(200).jsonp(data))
+      .catch(error=>res.status(502).jsonp(error))
   
 })
 
-router.post("/recursos/like/:id",function(req,res){
+router.delete("/recursos/like/:id",verificaNivelConsumidor,function(req,res){
+  Ficheiro.removeLike(req.params.id,req.body.id_user)
+      .then(data =>res.status(200).jsonp(data))
+      .catch(error=>res.status(502).jsonp(error))
   
 })
 
+router.delete("/recursos/dislike/:id",verificaNivelConsumidor,function(req,res){
+  Ficheiro.removeDislike(req.params.id,req.body.id_user)
+      .then(data =>res.status(200).jsonp(data))
+      .catch(error=>res.status(502).jsonp(error))
+})
 
-router.get("/recursos/user/:id",function(req,res){
+
+
+router.get("/recursos/user/:id",verificaNivelProdutor,function(req,res){
   Ficheiro.consultarUser(req.params.id)
         .then(data =>res.status(200).jsonp(data))
         .catch(error=>res.status(503).jsonp({error:error}))
@@ -58,20 +103,20 @@ router.get("/recursos/user/:id",function(req,res){
 })
 
 
-router.get("/recursos/:id",function(req,res){
+router.get("/recursos/:id",verificaNivelConsumidor,function(req,res){
   console.log(req.params.id)
   Ficheiro.consultar(req.params.id)
           .then(ficheiro=> res.status(200).jsonp(ficheiro))
           .catch(error=>res.status(504).jsonp({error:error}))
 })
 
-router.put("/recursos/:id",function(req,res){
+router.put("/recursos/:id",verificaNivelProdutor,function(req,res){
   Ficheiro.alterar(req.params.id,req.body.tipo_recurso)
         .then(ficheiro=>res.status(200).jsonp(ficheiro))
         .catch(error=>res.status(505).jsonp({error:error}))
 })
 
-router.delete("/recursos/:id",function(req,res){
+router.delete("/recursos/:id",verificaNivelProdutor,function(req,res){
   Ficheiro.remover(req.params.id)
         .then(ficheiro=>{res.status(200).jsonp(ficheiro)})
         .catch(error=>res.status(506).jsonp({error:error}))

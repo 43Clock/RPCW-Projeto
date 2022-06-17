@@ -20,8 +20,8 @@ module.exports.inserir = u => {
     return novo.save()
 }
 
-module.exports.remover = function(uname){
-    return User.deleteOne({username: uname})
+module.exports.remover = function(id){
+    return User.deleteOne({_id: mongoose.Types.ObjectId(id)})
 }
 
 module.exports.alterar = function(u){

@@ -27,6 +27,8 @@ block content
                     th(id="2" onclick="sortTable(2)") Ficheiro
                     th(id="3" onclick="sortTable(3)") Titulo Recurso
                     th(id="4" onclick="sortTable(4)") Tipo
+                    th(id="5" onclick="sortTable(5)") Likes
+                    th(id="6" onclick="sortTable(6)") Dislikes
                     th Download 
             tbody(id="tableBody")
                 each f in ficheiros
@@ -36,8 +38,10 @@ block content
                         td=f.nome_ficheiro
                         td=f.titulo_recurso
                         td=f.tipo_recurso
+                        td=f.likedBy.length
+                        td=f.dislikedBy.length
                         td
-                            a(href="/download/"+f._id onclick="event.cancelBubble" class="w3-button w3-green w3-round w3-tiny")
+                            a(href="/download/"+f._id onclick="event.stopPropagation()" class="w3-button w3-green w3-round w3-tiny")
                                 i(class="fas fa-download")
         else
           p Ainda não há ficheiros armazenados...
