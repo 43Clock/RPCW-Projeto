@@ -51,7 +51,7 @@ app.use(function(req,res,next){
     })
   }
   else{
-    res.status(403).jsonp({error:"Não tem permissão para aceder"})
+    res.status(403).jsonp({error:"Não tem permissão para aceder à API de dados"})
   }
 })
 
