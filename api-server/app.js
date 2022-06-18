@@ -38,7 +38,6 @@ app.use(function(req,res,next){
     jwt.verify(token,"RPCWProjeto", (e,payload)=>{
       if(e){
         if(!(e instanceof jwt.TokenExpiredError)){
-          console.log(":(")
           res.status(403).jsonp({error:"Não tem permissão para aceder"})
         }
         else
@@ -51,7 +50,11 @@ app.use(function(req,res,next){
     })
   }
   else{
-    res.status(403).jsonp({error:"Não tem permissão para aceder à API de dados"})
+    console.log(req.method)
+    if(req.url.includes("noticias") && req.method == "GET")
+      next()
+    else
+      res.status(403).jsonp({error:"Não tem permissão para aceder à API de dados"})
   }
 })
 

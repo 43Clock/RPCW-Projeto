@@ -8,10 +8,15 @@ const fs = require("fs");
 const bcrypt = require("bcrypt");
 const path = require('path');
 const {spawn} = require('child_process');
-
-
-
 var upload = multer({ dest: "uploads/" });
+
+if (!fs.existsSync(__dirname + "/../logs")) {
+  fs.mkdirSync(__dirname + "/../logs",{recursive:true})
+}
+
+//upload|data|info
+var log = fs.createWriteStream(__dirname+"/../logs/logs.log",{flags:"a"})
+
 
 
 function verificaNivelConsumidor(req,res,next){
@@ -57,6 +62,7 @@ router.get("/",function(req,res){
 router.get("/recursos",verificaNivelConsumidor, function (req, res) {
   axios.get("http://localhost:8001/api/recursos?token="+req.cookies.token)
       .then(dados=>{
+        log.write("recursos|vis|"+ new Date().toISOString().substring(0,16)+"|"+req.username+"\n")
         res.status(200).render("recursos",{ficheiros:dados.data,token:req.level,user:req.username});  
       })
       .catch(error=>{
@@ -66,12 +72,15 @@ router.get("/recursos",verificaNivelConsumidor, function (req, res) {
 
 router.get("/projetos",verificaNivelConsumidor,function(req,res){
   axios.get("http://localhost:8001/api/projetos?token="+req.cookies.token)
-      .then(data=>res.status(200).render("projetos",{projetos:data.data.projetos,ficheiros:data.data.ficheiros,token:req.level}))
+      .then(data=>{
+        log.write("projetos|vis|"+ new Date().toISOString().substring(0,16)+"|"+req.username+"\n")
+        res.status(200).render("projetos",{projetos:data.data.projetos,ficheiros:data.data.ficheiros,token:req.level})
+      })
       .catch(error=>{res.status(501).render("error",{error:error,token:req.level})})
 })
 
-router.get("/projetos/:id",verificaNivelConsumidor,function(req,res){
-    var hash = CryptoJs.MD5(req.params.id).toString();
+router.get("/projetos/:key",verificaNivelConsumidor,function(req,res){
+    var hash = CryptoJs.MD5(req.params.key).toString();
     var firstHalf = hash.slice(0, 16);
     var secondHalf = hash.slice(16, 32);
     var caminho = __dirname + "/../files/" + firstHalf + "/" + secondHalf+"/data"
@@ -85,6 +94,7 @@ router.get("/projetos/:id",verificaNivelConsumidor,function(req,res){
         else{
           fs.unlinkSync(__dirname+"/../"+hash+".zip")
           res.status(200)
+          log.write("projeto|down|"+ new Date().toISOString().substring(0,16)+"|"+req.username+"|"+firstHalf+secondHalf+"\n")
         }
       })
     })
@@ -179,6 +189,7 @@ router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req,
             });
             console.log(oldPath)
             res.redirect("/upload?sucesso="+"Ficheiro inserido")
+            log.write("upload|upload|"+ new Date().toISOString().substring(0,16)+"|"+req.username+"\n")
           } 
           //Caso de não ter todos os ficheiros
         else {
@@ -208,6 +219,8 @@ router.get("/download/:id", verificaNivelConsumidor, function(req,res){
           var secondHalf = hash.slice(16, 32);
           res.download(__dirname+"/../files/"+firstHalf+"/"+secondHalf+"/"+ficheiro.path_recurso+ficheiro.nome_ficheiro)
           res.status(200)
+          log.write("recursos|down|"+ new Date().toISOString().substring(0,16)+"|"+req.username+"|"+ficheiro.nome_ficheiro+"\n")
+
       })
       .catch(error=>{
         res.status(501).render("error",{error:error,token:req.level})
@@ -228,6 +241,7 @@ router.post("/login",function(req,res){
         httpOnly: true
       });
       res.redirect('/')
+      log.write("login|succ|"+ new Date().toISOString().substring(0,16)+"|"+req.body.username+"\n")
     })
     .catch(error => {
       if(error.response.status == 409 || error.response.status == 401){
@@ -262,6 +276,7 @@ router.post("/registar",function(req,res){
   form_data.username = req.body.username.toLowerCase()
   axios.post("http://localhost:8002/users/registar",form_data)
       .then(data => {
+        log.write("registar|succ|"+ new Date().toISOString().substring(0,16)+"|"+form_data.username+"|"+form_data.level+"\n")
         res.redirect("/")
       })
       .catch(error=>{
@@ -284,7 +299,10 @@ router.get("/editar",verificaNivelProdutor,function(req,res){
 
 router.put("/editar/:id",verificaNivelProdutor,function(req,res){
   axios.put("http://localhost:8001/api/recursos/"+req.params.id+"?token="+req.cookies.token,req.body)
-      .then(data=>res.status(200).send({result: "redirect", url:"/editar?sucesso=Alteração feita com sucesso!"}))
+      .then(data=>{
+        res.status(200).send({result: "redirect", url:"/editar?sucesso=Alteração feita com sucesso!"})
+        log.write("recursos|edit|"+ new Date().toISOString().substring(0,16)+"|"+req.username+"|"+req.params.id+"\n")
+      })
       .catch(error=>res.status(501).jsonp(error))
 })
 
@@ -307,6 +325,7 @@ router.delete("/editar/:id",verificaNivelProdutor,function(req,res){
                 var secondHalf = hash.slice(16, 32);
                 fs.unlinkSync(__dirname+"/../files/"+firstHalf+"/"+secondHalf+"/"+ficheiro.path_recurso+ficheiro.nome_ficheiro)
                 res.redirect("/editar")
+                log.write("recursos|delete|"+ new Date().toISOString().substring(0,16)+"|"+req.username+"|"+req.params.id+"\n")
               })
               .catch(error=>res.status(501).render("error",{error:error,token:req.level}))
         }
@@ -349,7 +368,7 @@ router.delete("/admin/utilizadores/:id",verificaNivelAdministrador,function(req,
 
 //Rotas para os recursos (admin)
 router.get("/admin/recursos",verificaNivelAdministrador,function(req,res){
-  axios.get("http://localhost:8001/api/recursos")
+  axios.get("http://localhost:8001/api/recursos?token="+req.cookies.token)
        .then(data=>res.status(200).render("admin-recursos",{token:req.level,recursos:data.data,sucesso:req.query.sucesso}))
        .catch(error=>res.status(501).render("error",{error:error,token:req.level}))
 })
@@ -361,7 +380,6 @@ router.put("/admin/recursos/:id",verificaNivelAdministrador,function(req,res){
 })
 
 router.delete("/admin/recursos/:id",verificaNivelAdministrador,function(req,res){
-  console.log("YESSS")
   axios.get("http://localhost:8001/api/recursos/"+req.params.id+"?token="+req.cookies.token)
       .then(data=>{
           var ficheiro = data.data
@@ -378,22 +396,21 @@ router.delete("/admin/recursos/:id",verificaNivelAdministrador,function(req,res)
       })
 })
 
-
-
-
-router.get("/admin/logs",verificaNivelAdministrador,function(req,res){
-  res.status(200).render("admin-logs",{token:req.level})
-})
-
-
 router.get("/admin/estatisticas",verificaNivelAdministrador,function(req,res){
-  res.status(200).render("admin-estatisticas",{token:req.level})
+  fs.readFile(__dirname+"/../logs/logs.log", 'utf8' , (err, data) => {
+    if (err) {
+      res.status(510).send("HYWAGDI")
+      return
+    } 
+    var linhas = data.split("\n").slice(0,-1)
+    res.status(200).send(linhas)
+  })
 })
 
 
 
 
-router.get("/noticias",verificaNivelAdministrador,function(req,res){
+router.get("/noticias",function(req,res){
   axios.get("http://localhost:8001/api/noticias",{params:{token: req.cookies.token,visivel:true, start:req.query.start}})
     .then(data=>res.status(200).jsonp({noticias:data.data}))
     .catch(error=>{
@@ -401,6 +418,7 @@ router.get("/noticias",verificaNivelAdministrador,function(req,res){
       res.status(501).jsonp({error:error})
     })
 })
+
 //Rotas para tratar das noticias do admin
 router.get("/admin/noticias",verificaNivelAdministrador,function(req,res){
   axios.get("http://localhost:8001/api/noticias?token="+req.cookies.token)
