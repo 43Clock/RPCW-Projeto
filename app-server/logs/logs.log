@@ -10,12 +10,12 @@ projetos|vis|2022-06-18T11:03|admin
 recursos|vis|2022-06-18T11:03|admin
 recursos|down|2022-06-18T11:04|admin|erlang-func-en.pdf
 projetos|vis|2022-06-18T11:04|admin
-projeto|down|2022-06-18T11:04|admin|1bd24ac0903999c59803c2537412b79c
+projetos|down|2022-06-18T11:04|admin|1bd24ac0903999c59803c2537412b79c
 recursos|edit|2022-06-18T11:04|admin|62acc1cf632a46d9ce68b09b
 upload|upload|2022-06-18T11:05|admin
 recursos|vis|2022-06-18T11:05|admin
 projetos|vis|2022-06-18T11:05|admin
-projeto|down|2022-06-18T11:05|admin|1bd24ac0903999c59803c2537412b79c
+projetos|down|2022-06-18T11:05|admin|1bd24ac0903999c59803c2537412b79c
 recursos|edit|2022-06-18T11:05|admin|62adb15ecb49af2f3d5b7514
 registar|succ|2022-06-18T11:06|pombo
 login|succ|2022-06-18T11:07|admin
@@ -36,8 +36,8 @@ recursos|delete|2022-06-18T13:35|admin|62add470bc46e23233a7ec98
 recursos|vis|2022-06-18T13:35|admin
 recursos|down|2022-06-18T13:35|admin|erlang-intro-en.pdf
 projetos|vis|2022-06-18T13:35|admin
-projeto|down|2022-06-18T13:35|admin|f5eebd6a8ac0633c3786341f046eb813
-projeto|down|2022-06-18T13:36|admin|f5eebd6a8ac0633c3786341f046eb813
+projetos|down|2022-06-18T13:35|admin|f5eebd6a8ac0633c3786341f046eb813
+projetos|down|2022-06-18T13:36|admin|f5eebd6a8ac0633c3786341f046eb813
 recursos|down|2022-06-18T13:36|admin|erlang-intro-en.pdf
 recursos|vis|2022-06-18T13:36|admin
 recursos|down|2022-06-18T13:36|admin|erlang-intro-en.pdf
@@ -59,8 +59,9 @@ recursos|vis|2022-06-18T14:28|produtor
 recursos|down|2022-06-18T14:28|produtor|prc2021-ficha-aferição.xml
 recursos|vis|2022-06-18T14:28|produtor
 projetos|vis|2022-06-18T14:28|produtor
-projeto|down|2022-06-18T14:28|produtor|0eb3c7c44d102f6a61e897b0937683b7
+projetos|down|2022-06-18T14:28|produtor|0eb3c7c44d102f6a61e897b0937683b7
 recursos|vis|2022-06-18T14:28|produtor
 recursos|down|2022-06-18T14:28|produtor|ficha-pri-avaliacao2020.xml
 login|succ|2022-06-18T14:28|admin
 recursos|down|2022-06-18T14:29|admin|ficha-pri-avaliacao2020.xml
+login|succ|2022-06-18T15:40|admin

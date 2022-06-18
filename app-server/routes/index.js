@@ -94,7 +94,7 @@ router.get("/projetos/:key",verificaNivelConsumidor,function(req,res){
         else{
           fs.unlinkSync(__dirname+"/../"+hash+".zip")
           res.status(200)
-          log.write("projeto|down|"+ new Date().toISOString().substring(0,16)+"|"+req.username+"|"+firstHalf+secondHalf+"\n")
+          log.write("projetos|down|"+ new Date().toISOString().substring(0,16)+"|"+req.username+"|"+firstHalf+secondHalf+"\n")
         }
       })
     })
@@ -398,7 +398,7 @@ router.delete("/admin/recursos/:id",verificaNivelAdministrador,function(req,res)
 router.get("/admin/estatisticas",verificaNivelAdministrador,function(req,res){
   fs.readFile(__dirname+"/../logs/logs.log", 'utf8' , (err, data) => {
     if (err) {
-      res.status(510).send("HYWAGDI")
+      res.status(510).render("error",{error:err,token:req.level})
       return
     } 
     var linhas = data.split("\n").slice(0,-1)
@@ -407,10 +407,14 @@ router.get("/admin/estatisticas",verificaNivelAdministrador,function(req,res){
         "recursos":0,
         "projetos":0
       },
-      "download":[],
+      "download":{
+        "recursos":[],
+        "projetos":[]
+      },
       "upload":[]
     }
-    download={}
+    download_recursos={}
+    download_projetos={}
     upload={}
 
     linhas.forEach((linha)=>{
@@ -419,9 +423,17 @@ router.get("/admin/estatisticas",verificaNivelAdministrador,function(req,res){
         data[elem[1]][elem[0]]+=1
       else{
         if(elem[1]=="down"){
-          if(download[elem[3]]==undefined)
-            download[elem[3]]=0
-          download[elem[3]]+=1
+          if(elem[0]=="recursos"){
+            if(download_recursos[elem[3]]==undefined)
+              download_recursos[elem[3]]=0
+            download_recursos[elem[3]]+=1
+          }else{
+            if(elem[0]=="projetos"){
+              if(download_projetos[elem[3]]==undefined)
+                download_projetos[elem[3]]=0
+              download_projetos[elem[3]]+=1
+            }
+          }
         }
         else{
           if(elem[1]=="upload"){
@@ -434,24 +446,34 @@ router.get("/admin/estatisticas",verificaNivelAdministrador,function(req,res){
     })
 
     let sortable = [];
-    for (var user in download) {
-      sortable.push((user, download[user]));
+    for (var user of Object.entries(download_recursos)) {
+        sortable.push(user);
     }
     sortable.sort(function(a, b) {
-        return a[1] - b[1];
+        return -a[1] + b[1];
     });
-    data["download"]=sortable
+    data["download"]["recursos"]=sortable
 
     sortable = [];
-    for (var user in upload) {
-      sortable.push((user, upload[user]));
+    for (var user of Object.entries(download_projetos)) {
+        sortable.push(user);
     }
     sortable.sort(function(a, b) {
-        return a[1] - b[1];
+        return -a[1] + b[1];
+    });
+    data["download"]["projetos"]=sortable
+
+
+    sortable = [];
+    for (var user of Object.entries(upload)) {
+        sortable.push(user);
+    }
+    sortable.sort(function(a, b) {
+        return -a[1] + b[1];
     });
     data["upload"]=sortable
-    
-    res.status(200).send(data)
+    //res.jsonp(data)
+    res.status(200).render("admin-estatisticas",{...data,token:req.level})
   })
 })
 
