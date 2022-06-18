@@ -40,7 +40,17 @@ function verificaNivelAdministrador(req,res,next){
 }
 
 router.get("/",function(req,res){
-  res.status(200).render("index",{token:req.level})
+  axios.get("http://localhost:8001/api/noticias",{params:{token: req.cookies.token,visivel:true, start:0}})
+       .then(data=>{
+         res.status(200).render("index",{token:req.level,noticias:data.data})
+        })
+       .catch(error=>{
+          //  console.log(error)
+          if(error.response.status==403)
+            res.status(200).render("index",{token:req.level})
+          else
+            res.status(501).render("error",{error:error,token:req.level})
+       })
 })
 
 
@@ -305,7 +315,7 @@ router.delete("/editar/:id",verificaNivelProdutor,function(req,res){
 })
 
 router.get("/admin",verificaNivelAdministrador,function(req,res){
-  res.status(200).render("admin-original")
+  res.redirect("/admin/utilizadores")
 })
 
 
@@ -383,7 +393,14 @@ router.get("/admin/estatisticas",verificaNivelAdministrador,function(req,res){
 
 
 
-
+router.get("/noticias",verificaNivelAdministrador,function(req,res){
+  axios.get("http://localhost:8001/api/noticias",{params:{token: req.cookies.token,visivel:true, start:req.query.start}})
+    .then(data=>res.status(200).jsonp({noticias:data.data}))
+    .catch(error=>{
+    //  console.log(error)
+      res.status(501).jsonp({error:error})
+    })
+})
 //Rotas para tratar das noticias do admin
 router.get("/admin/noticias",verificaNivelAdministrador,function(req,res){
   axios.get("http://localhost:8001/api/noticias?token="+req.cookies.token)

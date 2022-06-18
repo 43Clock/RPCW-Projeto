@@ -126,9 +126,21 @@ router.delete("/recursos/:id",verificaNivelProdutor,function(req,res){
 
 
 router.get("/noticias",function(req,res){
-  Noticias.listar()
-        .then(dados=> res.status(200).jsonp(dados))
-        .catch(erro=> res.status(507).jsonp(erro))
+  console.log()
+  if(req.query.visivel === undefined)
+    Noticias.listar()
+      .then(dados=> res.status(200).jsonp(dados))
+      .catch(erro=> res.status(507).jsonp(erro))
+  else
+  Noticias.listarFiltered(req.query.start,6)
+    .then(dados=>{
+      console.log(dados)
+      res.status(200).jsonp(dados)
+    })
+    .catch(erro=>{
+      console.log(erro)
+      res.status(507).jsonp(erro)
+    })
 })
 
 router.post("/noticias",function(req,res){

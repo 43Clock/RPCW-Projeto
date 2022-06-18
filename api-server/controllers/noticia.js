@@ -8,6 +8,14 @@ module.exports.listar = () => {
         .exec()
 }
 
+module.exports.listarFiltered = (b,l) => {
+    return Noticia
+        .find({visibilidade:"visivel"})
+        .skip(parseInt(b))
+        .limit(parseInt(l))
+        .exec()
+}
+
 module.exports.inserir = (t) => {
     var novo = new Noticia(t)
     return novo.save()
