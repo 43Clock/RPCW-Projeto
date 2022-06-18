@@ -32,7 +32,7 @@ block content
                     th Download 
             tbody(id="tableBody")
                 each f in ficheiros
-                    tr(onclick="displayComentarios("+JSON.stringify(f)+",'"+user+"')")
+                    tr(style="cursor:pointer" onclick="displayComentarios("+JSON.stringify(f)+",'"+user+"')")
                         td=f.data_submissao
                         td=f.id_submissor
                         td=f.nome_ficheiro

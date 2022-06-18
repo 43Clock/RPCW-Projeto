@@ -26,7 +26,7 @@ block content
                     th Download 
             tbody(id="tableBody")
                 each f in projetos
-                    tr(onclick="showFicheiros("+JSON.stringify(f)+","+JSON.stringify(ficheiros)+")")
+                    tr(style="cursor:pointer" onclick="showFicheiros("+JSON.stringify(f)+","+JSON.stringify(ficheiros)+")")
                         td=f.data_submissao
                         td=f.id_submissor
                         td=f.titulo_recurso

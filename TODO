@@ -1,15 +1,7 @@
 - Adicionar paginação as tabelas?
   
-- Adicionar criacao/edicao/remoção de noticias para o admin
+- Adicionar as noticias na página princial (load n noticias, mchegando ao fim carrega-se mais com jquery - usar bockmarks para gravar o estado?)
 
-- Adicionar as noticias na página princial (load n noticias, mchegando ao fim carrega-se mais com jquery - usar boockmarks para gravar o estado?)
+- Adicionar logs + chart.js ?
 
-- Proteger API (proteger rotas)!!!!
-
-- Adicionar logs + chart.js
-
-- Alterar o onclick da table row para uma cena + espefica
-
-- Melhorar o modal dos projetos
-
-- Verificar caracteres ao registar conta
+- Admin poder criar contas
