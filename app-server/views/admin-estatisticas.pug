@@ -19,15 +19,18 @@ block content-admin
 
 
     script.
-        var vis=#{vis}
-        var down=#{download}
-        var upload=#{upload}
+    
+        var vis=!{JSON.stringify(vis)}
+        var down=!{JSON.stringify(download)}
+        var upload=!{JSON.stringify(upload)}
+        
 
-        alert(JSON.stringify(down))
+        //as variaveis ja estão com as cenas bem (acho) so tens de fazer a tua cena
         if(down["recursos"].length > 3){
             down["recursos"].push(["outros",down["recursos"].splice(3).reduce((carry,value)=>carry+value[1],0)])
         }
         
+
         labels=[]
         size=[]
         for(i of down_data){

@@ -341,7 +341,10 @@ router.get("/admin",verificaNivelAdministrador,function(req,res){
 router.get("/admin/utilizadores",verificaNivelAdministrador,function(req,res){
   axios.get("http://localhost:8002/users")
     .then(data=>{
-      res.status(200).render("admin-utilizadores",{utilizadores:data.data,token:req.level,sucesso:req.query.sucesso,erro:req.query.erro})
+      res.status(200).render("admin-utilizadores",{utilizadores:data.data,token:req.level,
+                                                   sucesso:req.query.sucesso,erro:req.query.erro,
+                                                   sucessoRegistar:req.query.sucessoRegistar,
+                                                   erroRegistar:req.query.erroRegistar})
     })
     .catch(error=>res.status(501).render("error",{error:error}))
 })
@@ -362,6 +365,34 @@ router.delete("/admin/utilizadores/:id",verificaNivelAdministrador,function(req,
   axios.delete("http://localhost:8002/users",{data:{id_user:req.params.id}})
       .then(data=>res.status(200).send({result: "redirect", url:"/admin/utilizadores?sucesso=Remoção feita com sucesso!"}))
       .catch(error=>res.status(501).jsonp(error))
+})
+
+
+router.post("/admin/utilizadores/registar",function(req,res){
+  if(!onlyLettersAndNumbers(req.body.username)){
+    res.redirect("/admin/utilizadores?erroRegistar=Nome de utilizador so pode ter letras e/ou numeros")
+    return;
+  } 
+  if(req.body.password != req.body.password_confirm) {
+    res.redirect("/admin/utilizadores?erroRegistar=Passwords não são iguais")
+    return;
+  }
+  var form_data = req.body
+  const salt = bcrypt.genSaltSync(10)
+  form_data.password = bcrypt.hashSync(req.body.password,salt) 
+  form_data.username = req.body.username.toLowerCase()
+  axios.post("http://localhost:8002/users/registar",form_data)
+      .then(data => {
+        log.write("registar|succ|"+ new Date().toISOString().substring(0,16)+"|"+form_data.username+"|"+form_data.level+"\n")
+        res.redirect("/admin/utilizadores?sucessoRegistar=Utilizador registado com sucesso")
+      })
+      .catch(error=>{
+        if(error.response.status == 409){
+          res.status(409).redirect("/admin/utilizadores?erroRegistar="+error.response.data.erro)
+        }else{
+          res.status(501).render("error",{error:error,token:req.level})
+        }
+      })
 })
 
 
