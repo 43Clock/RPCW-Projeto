@@ -90,7 +90,7 @@ router.get("/projetos/:key",verificaNivelConsumidor,function(req,res){
     })
     python.on("done",()=>{
       res.download(__dirname+"/../"+hash+".zip",function(err){
-        if(err) res.status(501).render("error",{error:error,token:req.level})
+        if(err) res.status(501).render("error",{error:err,token:req.level})
         else{
           fs.unlinkSync(__dirname+"/../"+hash+".zip")
           res.status(200)
@@ -218,9 +218,8 @@ router.get("/download/:id", verificaNivelConsumidor, function(req,res){
           var firstHalf = hash.slice(0, 16);
           var secondHalf = hash.slice(16, 32);
           res.download(__dirname+"/../files/"+firstHalf+"/"+secondHalf+"/"+ficheiro.path_recurso+ficheiro.nome_ficheiro)
-          res.status(200)
           log.write("recursos|down|"+ new Date().toISOString().substring(0,16)+"|"+req.username+"|"+ficheiro.nome_ficheiro+"\n")
-
+          res.status(200)
       })
       .catch(error=>{
         res.status(501).render("error",{error:error,token:req.level})
@@ -403,7 +402,56 @@ router.get("/admin/estatisticas",verificaNivelAdministrador,function(req,res){
       return
     } 
     var linhas = data.split("\n").slice(0,-1)
-    res.status(200).send(linhas)
+    data={
+      "vis":{
+        "recursos":0,
+        "projetos":0
+      },
+      "download":[],
+      "upload":[]
+    }
+    download={}
+    upload={}
+
+    linhas.forEach((linha)=>{
+      elem=linha.split("|")
+      if(elem[1]=="vis")
+        data[elem[1]][elem[0]]+=1
+      else{
+        if(elem[1]=="down"){
+          if(download[elem[3]]==undefined)
+            download[elem[3]]=0
+          download[elem[3]]+=1
+        }
+        else{
+          if(elem[1]=="upload"){
+            if(upload[elem[3]]==undefined)
+              upload[elem[3]]=0
+            upload[elem[3]]+=1
+          }
+        }
+      }     
+    })
+
+    let sortable = [];
+    for (var user in download) {
+      sortable.push((user, download[user]));
+    }
+    sortable.sort(function(a, b) {
+        return a[1] - b[1];
+    });
+    data["download"]=sortable
+
+    sortable = [];
+    for (var user in upload) {
+      sortable.push((user, upload[user]));
+    }
+    sortable.sort(function(a, b) {
+        return a[1] - b[1];
+    });
+    data["upload"]=sortable
+    
+    res.status(200).send(data)
   })
 })
 

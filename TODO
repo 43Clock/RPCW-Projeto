@@ -1,9 +1,12 @@
 - Adicionar paginação as tabelas?
-  
-- Adicionar as noticias na página princial (load n noticias, mchegando ao fim carrega-se mais com jquery - usar bockmarks para gravar o estado?)
 
 - Adicionar logs + chart.js ?
 
 - remover alerts ao criar/alterar noticias
 
 - Admin poder criar contas
+
+
+- Adicionar tinymcedit para poder fazer listas e etc
+
+- Avisar de remoção bem sucedida
