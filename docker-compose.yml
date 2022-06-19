@@ -12,6 +12,9 @@ services:
       - DB=mongo
       - API=api
       - AUTH=auth
+    volumes:
+      - filesystem:/app/files
+      - filesystem:/app/logs
   api:
     restart: always
     depends_on: 
@@ -42,3 +45,4 @@ services:
       - mongodb:/data/db
 volumes:
  mongodb:
+ filesystem:

@@ -26,7 +26,7 @@ const drawDRPie = (labels,sizes,colors) => {
         }
     };
     chart1 = new Chart(ctx1, {
-        type: "pie",
+        type: "doughnut",
         data: data,
         options: options
     });
@@ -61,7 +61,7 @@ const drawDPPie = (labels,sizes,colors) => {
         }
     };
     chart1 = new Chart(ctx2, {
-        type: "pie",
+        type: "doughnut",
         data: data,
         options: options
     });
@@ -96,7 +96,7 @@ const drawUPPie = (labels,sizes,colors) => {
         }
     };
     chart1 = new Chart(ctx3, {
-        type: "pie",
+        type: "doughnut",
         data: data,
         options: options
     });
