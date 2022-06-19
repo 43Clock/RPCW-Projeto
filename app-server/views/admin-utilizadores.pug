@@ -4,9 +4,9 @@ block content-admin
     h2 Adicionar novo utilizador
     form.w3-container(action='/admin/utilizadores/registar' method='POST')
             if(erroRegistar)
-              p(class="w3-center w3-red")=erroRegistar
+              p(class="w3-center w3-red" id="report")=erroRegistar
             if(sucessoRegistar)
-              p(class="w3-center w3-green")=sucessoRegistar
+              p(class="w3-center w3-green" id="report")=sucessoRegistar
             label Username
             input.w3-input.w3-border.w3-round(type="text" name="username" required)
             label Password

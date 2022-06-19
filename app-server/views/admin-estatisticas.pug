@@ -7,10 +7,13 @@ block content-admin
 
     .w3-row-padding 
         .w3-col.m4 
+            h6 Grafico de downloads de recursos
             canvas(id="downloadrecursos")
         .w3-col.m4 
+            h6 Grafico de downloads de projetos
             canvas(id="downloadprojetos")
         .w3-col.m4 
+            h6 Grafico de uploads
             canvas(id="uploads")
 
 
@@ -23,19 +26,61 @@ block content-admin
         var vis=!{JSON.stringify(vis)}
         var down=!{JSON.stringify(download)}
         var upload=!{JSON.stringify(upload)}
-        
 
-        //as variaveis ja estão com as cenas bem (acho) so tens de fazer a tua cena
+        //Graph1 - drawDRPie
         if(down["recursos"].length > 3){
             down["recursos"].push(["outros",down["recursos"].splice(3).reduce((carry,value)=>carry+value[1],0)])
         }
         
-
         labels=[]
         size=[]
-        for(i of down_data){
-            alert(i)
+         //alert(JSON.stringify(down["recursos"]))
+        for(i in down["recursos"]){
+            labels.push(down["recursos"][i][0])
+            size.push(down["recursos"][i][1])
         }
 
         bgcolors=['Red','Yellow','Blue',"Green"]
-        bgcolors.splice(down_data.length)
+        bgcolors.splice(down["recursos"].length)
+
+        drawDRPie(labels,size,bgcolors)
+
+
+
+         //Graph2 - drawDPPie
+        if(down["projetos"].length > 3){
+            down["projetos"].push(["outros",down["projetos"].splice(3).reduce((carry,value)=>carry+value[1],0)])
+        }
+        
+        labels=[]
+        size=[]
+         //alert(JSON.stringify(down["projetos"]))
+        for(i in down["projetos"]){
+            labels.push(down["projetos"][i][0])
+            size.push(down["projetos"][i][1])
+        }
+
+        bgcolors=['Red','Yellow','Blue',"Green"]
+        bgcolors.splice(down["projetos"].length)
+
+        drawDPPie(labels,size,bgcolors)
+
+
+
+         //Graph3 - drawUPPie
+        if(upload.length > 3){
+            upload.push(["outros",upload.splice(3).reduce((carry,value)=>carry+value[1],0)])
+        }
+        
+        labels=[]
+        size=[]
+         //alert(JSON.stringify(down["projetos"]))
+        for(i in upload){
+            labels.push(upload[i][0])
+            size.push(upload[i][1])
+        }
+
+        bgcolors=['Red','Yellow','Blue',"Green"]
+        bgcolors.splice(upload.length)
+
+        drawUPPie(labels,size,bgcolors)

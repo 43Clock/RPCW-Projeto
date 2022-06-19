@@ -1,7 +1,7 @@
 extends admin-layout
 
 block content-admin
-
+    p(class="w3-center" id="report")
     div.w3-cells-row.w3-margin-top.w3-margin-bottom
             div.w3-container.w3-cell
                 input(type="text" id="searchbar" placeholder="Search..." class="w3-input w3-border w3-round")
@@ -43,6 +43,7 @@ block content-admin
 
     script(type="application/javascript" src= "https://cdn.tiny.cloud/1/no-api-key/tinymce/6.0.3-5/tinymce.min.js")
     script(type="application/javascript" src= "/javascripts/my-tinymce-config.js")
+    script(type="application/javascript" src= "/javascripts/tableQuery.js")
  
     script.
 
@@ -142,11 +143,11 @@ block content-admin
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: function(){
-                    alert("só alterar")
+                    //alert("só alterar")
                     location.reload()
                 },
                 error: function(){
-                    alert("erro")
+                    //alert("erro")
                     location.reload()
                 }
             })   
@@ -161,12 +162,14 @@ block content-admin
                 url:"http://localhost:8003/admin/noticias/"+id,
                 type: 'DELETE',
                 success: function(){
-                    alert("só htmlelement.remove")
-                    location.reload()
+                    //"row-"+noticia._id)
+                    $("#row-"+id).remove()
+                    //location.reload()
                 },
                 error: function(){
-                    alert("erro")
-                    location.reload()
+                    //alert("erro")
+                    //location.reload()
+                    createReport("red","Erro na remoção")
                 }
             })     
         })
@@ -267,3 +270,20 @@ block content-admin
                 }
             })
         })
+
+        
+        function createReport(cor,msg){
+            $("#report").empty()
+            $("#report").append(msg)
+            $("#report").removeClass('hidden');
+            $("#report").removeClass('w3-red');
+            $("#report").removeClass('w3-green');
+            $("#report").addClass("w3-"+cor);
+            window.setTimeout("closereport();", 2500);
+        }
+        
+        function closereport(){
+          //div.classList.remove('visible');
+          // w3-red
+          $("#report").addClass("hidden");
+        }
