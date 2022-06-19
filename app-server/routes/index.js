@@ -169,8 +169,8 @@ router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req,
                     fs.mkdirSync(__dirname + "/../files/" +firstHalf + "/" +secondHalf +"/" +path);
                   }
                 }
-                fs.writeFileSync(__dirname + "/../files/" + firstHalf +"/" + secondHalf + "/" + path + file.name,
-                  decoder.decode(file.getData()));
+                // fs.writeFileSync(__dirname + "/../files/" + firstHalf +"/" + secondHalf + "/" + path + file.name,
+                //   decoder.decode(file.getData()));
                 const body = {
                   data_criacao: metadados.date,
                   data_submissao: data,
@@ -189,7 +189,8 @@ router.post("/upload", upload.array("zip"),verificaNivelProdutor, function (req,
                     })
               }
             });
-            console.log(oldPath)
+            
+            zip.extractAllTo(__dirname + "/../files/" + firstHalf +"/" + secondHalf,true)
             res.redirect("/upload?sucesso="+"Ficheiro inserido")
             log.write("upload|upload|"+ new Date().toISOString().substring(0,16)+"|"+req.username+"\n")
           } 
