@@ -110,7 +110,7 @@ block content-admin
             
             var data = {}
             $.ajax({
-                url:"http://localhost:8003/admin/noticias/"+id,
+                url : "/admin/noticias/"+id,
                 type: 'GET',
                 success: function(result){
                     //alert(JSON.stringify(result))
@@ -159,7 +159,7 @@ block content-admin
             lastId = undefined
             var data = {}
             $.ajax({
-                url:"http://localhost:8003/admin/noticias/"+id,
+                url : "/admin/noticias/"+id,
                 type: 'DELETE',
                 success: function(){
                     //"row-"+noticia._id)
@@ -261,11 +261,11 @@ block content-admin
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: function(){
-                    alert("só alterar")
+                    //alert("só alterar")
                     location.reload()
                 },
                 error: function(){
-                    alert("erro")
+                    //alert("erro")
                     location.reload()
                 }
             })

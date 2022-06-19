@@ -6,11 +6,13 @@ var cookieParser = require('cookie-parser');
 var jwt = require('jsonwebtoken');
 var cors = require("cors")
 
+var mongo = process.env.DB || 'localhost';
+
 
 var apiRouter = require('./routes/api');
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://127.0.0.1:27017/Projeto', 
+mongoose.connect('mongodb://'+mongo+':27017/Projeto', 
       { useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: false,

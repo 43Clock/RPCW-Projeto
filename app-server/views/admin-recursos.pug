@@ -159,7 +159,7 @@ block content-admin
                 lastId = undefined
                 var data = {}
                 $.ajax({
-                    url:"http://localhost:8003/admin/recursos/"+id,
+                    url : "/admin/recursos/"+id,
                     type: 'DELETE',
                     success: function(response){
                         if(response.result == "redirect"){

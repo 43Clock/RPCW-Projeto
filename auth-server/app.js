@@ -4,13 +4,15 @@ var logger = require('morgan');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 
+var mongo = process.env.DB || 'localhost';
+
 
 var passport = require('passport')
 var LocalStrategy = require('passport-local').Strategy
 
 var mongoose = require('mongoose');
 
-mongoose.connect('mongodb://127.0.0.1:27017/Projeto', 
+mongoose.connect('mongodb://'+mongo+':27017/Projeto', 
       { useNewUrlParser: true,
         useUnifiedTopology: true,
         serverSelectionTimeoutMS: 5000});

@@ -1,0 +1,44 @@
+version: '3'
+services:
+  app:
+    restart: always
+    depends_on: 
+      - auth
+      - api
+    image: zecosta109/app-server
+    ports:
+      - 80:8003
+    environment:
+      - DB=mongo
+      - API=api
+      - AUTH=auth
+  api:
+    restart: always
+    depends_on: 
+      - mongo
+    image: zecosta109/api-server
+    ports:
+      - 8001:8001
+    environment:
+      - DB=mongo
+      - API=api
+      - AUTH=auth
+  auth:
+    restart: always
+    depends_on: 
+      - mongo
+    image: zecosta109/auth-server
+    ports:
+      - 8002:8002
+    environment:
+      - DB=mongo
+      - API=api
+      - AUTH=auth
+  mongo:
+    image: mongo
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb:/data/db
+volumes:
+ mongodb:

@@ -167,7 +167,7 @@ block content-admin
                 if(level != lastLevel) data["level"] = level
                 else data["level"] = lastLevel
                 $.ajax({
-                    url:"http://localhost:8003/admin/utilizadores/"+id,
+                    url : "/admin/utilizadores/"+id,
                     type: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(data),
@@ -187,7 +187,7 @@ block content-admin
             var id = $(this).attr("id").split("-")[1]
             lastId = undefined
             $.ajax({
-                url:"http://localhost:8003/admin/utilizadores/"+id,
+                url : "/admin/utilizadores/"+id,
                 type: 'DELETE',
                 success: function(response){
                     if(response.result == "redirect"){

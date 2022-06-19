@@ -7,6 +7,7 @@ var passport = require('passport')
 var User = require('../controllers/user')
 
 
+
 router.get("/",function(req,res){
   User.listar()
       .then(data=>res.status(200).jsonp(data))

@@ -6,15 +6,16 @@ block content-admin
     h5 A página de projetos foi visitada #{vis.projetos} vezes.
 
     .w3-row-padding 
-        .w3-col.m4 
+        .w3-col.l4 
             h6 Grafico de downloads de recursos
             canvas(id="downloadrecursos")
-        .w3-col.m4 
+        .w3-col.l4 
             h6 Grafico de downloads de projetos
             canvas(id="downloadprojetos")
-        .w3-col.m4 
+        .w3-col.l4 
             h6 Grafico de uploads
             canvas(id="uploads")
+    a(href="/admin/estatisticas/download" class="w3-button w3-green w3-round") Download logs
 
 
     script(type ="text/javascript" src="/javascripts/chart.js")
